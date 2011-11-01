@@ -1,0 +1,5 @@
+.*project
+v_env/
+*.pyc
+*/local_config.py
+error.log
