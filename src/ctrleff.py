@@ -29,7 +29,7 @@ def init_app(app):
     """
     for api_name in API_TO_REGISTER:
         __import__("api." + api_name)
-        getattr(api, api_name).register_api(app)
+        getattr(api, api_name)._register_api(app)
 
 if __name__ == '__main__':
     app = get_app()

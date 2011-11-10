@@ -1,0 +1,108 @@
+#===============================================================================
+# utils to interface with facebook opengraph
+#===============================================================================
+from rest_client.rest import Request as ReSTRequest
+from util.util import random_letters
+
+FACEBOOK_GRAPH_API_URL = "graph.facebook.com"
+PERMISSIONS = "email,offline_access,publish_stream"  
+
+def get_app_access_token(app_id, app_secret):
+    """
+    Authenticates appl
+    Exchanges app's secret to get an (app) access token
+    """
+    param = {
+             "client_id": app_id,
+             "client_secret": app_secret,
+             "grant_type": "client_credentials",
+             }
+    
+    app_auth_request = ReSTRequest(FACEBOOK_GRAPH_API_URL, "get", param)
+    app_auth_request.send("/oauth/access_token")
+    result = app_auth_request.decoded_data()
+    return result["access_token"]
+
+def get_user_access_token(code, app_id, app_secret, redirect_uri="http://ctrleff.com/"):
+    """
+    Authenticates an app with a user's code;
+    Exchanges a user's auth code and to an access token
+    """
+    
+    #build param with app's data
+    param = {
+             "client_id":app_id,
+             "client_secret":app_secret,
+             "redirect_uri":redirect_uri,
+             "code":code,
+             }
+    
+    app_auth_request = ReSTRequest(FACEBOOK_GRAPH_API_URL, "get", param)
+    app_auth_request.send("/oauth/access_token")
+    result = app_auth_request.decoded_data()
+    return result["access_token"]
+
+def create_test_user(app_id, app_xs_token):
+    param = {
+             "installed":"true",
+             "name": random_letters()[:5],
+             "method": "post",
+             "access_token": app_xs_token,
+             "permissions": PERMISSIONS
+             }
+    
+    request = ReSTRequest(FACEBOOK_GRAPH_API_URL, "post", param)
+    request.send("/%s/accounts/test-users" % app_id)
+    result = request.json_data()
+    return result
+
+def make_friend_connection(user1_id, user2_id, user1_xs_token, user2_xs_token):
+    request = ReSTRequest(FACEBOOK_GRAPH_API_URL, "post", param = {"method": "post", "access_token": user1_xs_token})
+    request2 = ReSTRequest(FACEBOOK_GRAPH_API_URL, "post", param = {"method": "post", "access_token": user2_xs_token})
+    request.send("/%s/friends/%s" % (user1_id, user2_id))
+    request2.send("/%s/friends/%s" % (user2_id, user1_id))
+
+def delete_test_user(user_id, app_xs_token):
+    request = ReSTRequest(FACEBOOK_GRAPH_API_URL, "delete", param = {"access_token": app_xs_token})
+    request.send("/%s" % user_id)
+    result = request.json_data()
+    return result
+
+def delete_all_test_users(app_id, app_xs_token):
+    request = ReSTRequest(FACEBOOK_GRAPH_API_URL, "get", param = {"access_token": app_xs_token})
+    request.send("/%s/accounts/test-users" % app_id)
+    data = request.json_data()
+    test_users = data["data"]
+    for user in test_users:
+        delete_test_user(user["id"], app_xs_token) 
+
+class FacebookApi:
+    
+    access_token = None
+    
+    def __init__(self, access_token):
+        self.access_token = access_token
+
+    def get_info(self):
+        req = ReSTRequest(FACEBOOK_GRAPH_API_URL, "get", {
+                                                          "access_token": self.access_token,
+                                                          })
+        req.send("/me")
+        return req.json_data()
+
+    def get_friends(self):
+        req = ReSTRequest(FACEBOOK_GRAPH_API_URL, "get", {
+                                                          "access_token": self.access_token,
+                                                          "offset": 0,
+                                                          "format": "json",
+                                                          "limit": 50000,                                                          
+                                                          })
+        req.send("/me/friends")
+        return req.json_data()
+    
+    def post_own_wall(self):
+        pass
+    
+    def post_wall(self):
+        pass
+

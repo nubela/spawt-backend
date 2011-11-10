@@ -12,24 +12,24 @@ class Location(db.Model):
     latitude = db.Column(db.Float)
 
 class FacebookUser(db.Model):
-    fb_id = db.Column(db.String(255), primary_key=True)
-    email = db.Column(db.String(255))
+    id = db.Column(db.String(255), primary_key=True)
     name = db.Column(db.String(255))
-    first_name = db.Column(db.String(255))
-    middle_name = db.Column(db.String(255))
-    last_name = db.Column(db.String(255))
-    gender = db.Column(db.String(255))
-    username = db.Column(db.String(255))
-    link = db.Column(db.String(255))
+    first_name = db.Column(db.String(255), nullable=True)
+    middle_name = db.Column(db.String(255), nullable=True)
+    last_name = db.Column(db.String(255), nullable=True)
+    gender = db.Column(db.String(255), nullable=True)
+    username = db.Column(db.String(255), nullable=True)
+    link = db.Column(db.String(255), nullable=True)
 
 class User(db.Model):
-    id = db.Column(db.String(255), primary_key=True)
-    facebook_info = db.relation("FacebookUser")
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255))
+    facebook_info = db.Column(db.String(255), db.ForeignKey('facebook_user.id'))
 
 class Checkpoint(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    creator = db.relation("User")
-    location = db.relation("Location")
+    creator = db.Column(db.Integer, db.ForeignKey('user.id'))
+    location = db.Column(db.String(255), db.ForeignKey('facebook_user.id'))
     description = db.Column(db.String(255))
     price = db.Column(db.Float)
     expiry = db.Column(db.DateTime)
@@ -42,28 +42,28 @@ class FriendConnection(db.Model):
     Describes a two-way connection between 2 friends on Facebook 
     """
     id = db.Column(db.Integer, primary_key=True)
-    fb_user_from = db.relation("FacebookUser")
-    fb_user_to = db.relation("FacebookUser")
+    fb_user_from = db.Column(db.String(255), db.ForeignKey('facebook_user.id'))
+    fb_user_to = db.Column(db.String(255), db.ForeignKey('facebook_user.id'))
 
 class UserCheckpoint(db.Model):
     """
     Stores the catalog of a users' Checkpoint
     """
     id = db.Column(db.Integer, primary_key=True)
-    user = db.relation("User")
-    checkpoint = db.relation("Checkpoint")
+    user = db.Column(db.Integer, db.ForeignKey('user.id'))
+    checkpoint = db.Column(db.Integer, db.ForeignKey('checkpoint.id'))
     
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user = db.relation("User")
+    user = db.Column(db.Integer, db.ForeignKey('user.id'))
     comment = db.Column(db.String(255))
     timestamp = db.Column(db.DateTime)
-    checkpoint = db.relation("Checkpoint")
+    checkpoint = db.Column(db.Integer, db.ForeignKey('checkpoint.id'))
 
 class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    checkpoint = db.relation("Checkpoint")
-    user = db.relation("User")
+    checkpoint = db.Column(db.Integer, db.ForeignKey('checkpoint.id'))
+    user = db.Column(db.Integer, db.ForeignKey('user.id'))
     timestamp = db.Column(db.DateTime)
     
 class Share(db.Model):
@@ -71,8 +71,8 @@ class Share(db.Model):
     Stores the Checkpoint shares between users
     """
     id = db.Column(db.Integer, primary_key=True)
-    user_from = db.relation("User")
-    user_to = db.relation("User")
-    checkpoint = db.relation("Checkpoint")
+    user_from = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_to = db.Column(db.Integer, db.ForeignKey('user.id'))
+    checkpoint = db.Column(db.Integer, db.ForeignKey('checkpoint.id'))
     timestemp = db.Column(db.DateTime)
     share_msg = db.Column(db.String(255))

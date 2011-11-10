@@ -1,8 +1,20 @@
+#===============================================================================
+# Checkpoint API Endpoints
+#===============================================================================
+
 def new_checkpoint(lat, lang, image):
     """
     (PUT: checkpoint)
     creates a barebone checkpoint (just location and image)
     this checkpoint is not complete yet.
+    """
+    pass
+
+def add_checkpoint():
+    """
+    (PUT: interesting_checkpoint)
+    user likes a Checkpoint from a user and wants to add it into his catalog;
+    adds checkpoint to user's catalog
     """
     pass
 
@@ -35,7 +47,7 @@ def new_comment(checkpoint_id, user_from, comment):
     """
     pass
 
-def register_api(app):
+def _register_api(app):
     """
     interface method so the app can register the API (routing) calls.
     """
@@ -57,5 +69,3 @@ def register_api(app):
     #comment endpoints
     app.add_url_rule('/comment/', 
                      "new_comment", new_comment, methods=['PUT'])
-    
-    
