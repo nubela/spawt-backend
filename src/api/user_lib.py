@@ -12,7 +12,7 @@ def save_user(access_token):
     """
     
     #get info
-    fb_api = FacebookApi(access_token)
+    fb_api = FacebookApi.new(access_token)
     user_info = fb_api.get_info()
     
     #save info into db
@@ -26,7 +26,7 @@ def save_user(access_token):
 def update_social_graph(access_token, fb_user=None):
     
     #get friends
-    fb_api = FacebookApi(access_token)
+    fb_api = FacebookApi.new(access_token)
     all_friends = fb_api.get_friends()
     if not fb_user:
         fb_user = get_facebook_user(fb_api.get_info()["id"])

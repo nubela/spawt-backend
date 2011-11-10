@@ -6,6 +6,7 @@ import httplib
 from simplejson import loads
 from urlparse import parse_qsl
 
+REQ_CACHE = {}
 
 class Request():
     """
@@ -26,6 +27,11 @@ class Request():
         self.base_url = base_url
         self.request_type = request_type
         self.set_param(param)
+        REQ_CACHE[(base_url, request_type, hash(frozenset(param.items())))] = self
+        
+    @staticmethod
+    def new(base_url, request_type, param=None):
+        return REQ_CACHE.get((base_url, request_type, hash(frozenset(param.items()))) ,Request(base_url, request_type, param))
         
     def set_param(self, param):
         """
@@ -39,6 +45,7 @@ class Request():
         Makes the actual api call and saves the result as data
         """
         if branch_url == None: branch_url = ""
+        
         if self.request_type.upper() == "GET":
             branch_url = branch_url + "?%s" % self.param
         
