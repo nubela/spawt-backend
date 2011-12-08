@@ -1,6 +1,6 @@
 from ctrleff import get_app
-from local_config import SQL_URI
 from flaskext.sqlalchemy import SQLAlchemy
+from local_config import SQL_URI
 
 app = get_app()
 app.config['SQLALCHEMY_DATABASE_URI'] = SQL_URI
@@ -25,14 +25,21 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255))
     facebook_info = db.Column(db.String(255), db.ForeignKey('facebook_user.id'))
+    facebook_user = db.relationship("FacebookUser")
+    
+    #authentication 
+    auth_code = db.Column(db.String(255), nullable=True)
+    access_token = db.Column(db.String(255), nullable=True)
 
 class Checkpoint(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     location = db.Column(db.String(255), db.ForeignKey('facebook_user.id'))
-    description = db.Column(db.String(255))
-    price = db.Column(db.Float)
-    expiry = db.Column(db.DateTime)
+    name = db.Column(db.String(255))
+    description = db.Column(db.String(255), nullable=True)
+    #tell_a_friend = db.Column(db.String(255), nullable=True)
+    price = db.Column(db.Float, nullable=True)
+    expiry = db.Column(db.DateTime, nullable=True)
     date_created = db.Column(db.DateTime)
     type = db.Column(db.String(255))
     image = db.Column(db.String(255))
@@ -47,12 +54,35 @@ class FriendConnection(db.Model):
 
 class UserCheckpoint(db.Model):
     """
-    Stores the catalog of a users' Checkpoint
-    """
-    id = db.Column(db.Integer, primary_key=True)
-    user = db.Column(db.Integer, db.ForeignKey('user.id'))
-    checkpoint = db.Column(db.Integer, db.ForeignKey('checkpoint.id'))
+    UserCheckpoints provides a relationship between a user and its catalog of Checkpoints.
+    A record of a UserCheckpoint linking the user to a Checkpoint demonstrates that
+    the user has the respective Checkpoint in its catalog of checkpoints.
     
+    This entirely represents the Checkpoint for that user, meaning that it could override
+    info from the Checkpoint by means of <<UserCheckpointOptions>>.
+    
+    Should another user inherit this 'localised' version of UserCheckpoint, it would inherit
+    the <<Checkpoint>> reference, as well all copies of <<UserCheckpointOptions>> that this
+    record is related to. The new <<UserCheckpoint>> reference is then independent.
+    """
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship("User")
+    checkpoint_id = db.Column(db.Integer, db.ForeignKey('checkpoint.id'))
+    checkpoint = db.relationship("Checkpoint")
+    
+class UserCheckpointOptions(db.Model):
+    """
+    Stores the meta info of a <<UserCheckpoint>>
+    """
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_checkpoint_id = db.Column(db.Integer, db.ForeignKey('user_checkpoint.id'))
+    user_checkpoint = db.relationship("UserCheckpoint")
+    name = db.Column(db.String(255))
+    value = db.Column(db.String(255))
+
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -71,8 +101,10 @@ class Share(db.Model):
     Stores the Checkpoint shares between users
     """
     id = db.Column(db.Integer, primary_key=True)
-    user_from = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user_to = db.Column(db.Integer, db.ForeignKey('user.id'))
-    checkpoint = db.Column(db.Integer, db.ForeignKey('checkpoint.id'))
-    timestemp = db.Column(db.DateTime)
-    share_msg = db.Column(db.String(255))
+    user_from_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_from = db.relationship("User", primaryjoin="Share.user_from_id==User.id")
+    user_to_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_to = db.relationship("User", primaryjoin="Share.user_to_id==User.id")
+    user_checkpoint_id = db.Column(db.Integer, db.ForeignKey('user_checkpoint.id'))
+    user_checkpoint = db.relationship("UserCheckpoint")
+    timestamp = db.Column(db.DateTime)

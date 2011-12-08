@@ -2,10 +2,10 @@ import unittest
 from facebook.facebook import create_test_user, get_app_access_token,\
     make_friend_connection
 from local_config import APP_ID, APP_SECRET
-from api.user_lib import save_user
 from ctrleff import init_db, get_app
 import tempfile
 import os
+from action.user import save_user
 
 class UserTests(unittest.TestCase):
     
@@ -13,16 +13,16 @@ class UserTests(unittest.TestCase):
         self.app = get_app()
         #declare testing state
         self.app.config["TESTING"] = True
+        self.db, self.app.config["DATABASE"] = tempfile.mkstemp()
+        
         #spawn test client
-        self.app = self.app.test_client()
+        self.client = self.app.test_client()
         #temp db
-        #self.db, self.app.config["DATABASE"] = tempfile.mkstemp()
         #init_db()
     
     def tearDown(self):
-        #os.close(self.db)
-        #os.unlink(self.app.config["DATABASE"])
-        pass
+        os.close(self.db)
+        os.unlink(self.app.config["DATABASE"])
     
     def test_save_user(self):
         #create test user with 3 friends
@@ -35,4 +35,4 @@ class UserTests(unittest.TestCase):
         make_friend_connection(test_user["id"], friend_2["id"], test_user["access_token"], friend_2["access_token"])
         make_friend_connection(test_user["id"], friend_3["id"], test_user["access_token"], friend_3["access_token"])
         
-        save_user(test_user["access_token"]) 
+        save_user(test_user["access_token"], "someauthcode") 

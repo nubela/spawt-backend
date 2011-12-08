@@ -3,16 +3,29 @@
 #===============================================================================
 from flask import Flask
 from local_config import API_TO_REGISTER
-import api
+import api 
 
 #utils
 
-def get_app():
+def get_resources_abs_path():
+    
+    #some nice shortcuts
+    from os.path import realpath, dirname as pparent, join as pjoin
+    
+    here = realpath(__file__)
+    return pjoin(pparent(pparent(here)) , "resources")
+
+def get_app(static=None):
     """
     factory for app
     """
+    if static:
+        #static var
+        return static
+    
     app =  Flask(__name__)
     init_app(app)
+    static = app
     return app
 
 def init_db():

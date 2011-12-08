@@ -6,7 +6,35 @@ from util.util import random_letters
 
 FACEBOOK_GRAPH_API_URL = "graph.facebook.com"
 PERMISSIONS = "email,offline_access,publish_stream"
+TEST_PERMISSIONS = "email,offline_access,publish_stream,read_stream"
 API_CACHE = {}  
+
+def get_wall_posts(app_access_token, profile_id):
+    """
+    (For unit tests)
+    Gets wall posts from a test user
+    branch: /PROFILE_ID/feed
+    """
+    param = {"access_token": app_access_token,
+             }
+    request = ReSTRequest.new(FACEBOOK_GRAPH_API_URL, "GET", param)
+    request.send("/"+profile_id+"/feed")
+    return request.json_data()
+
+def post_on_wall(app_access_token, profile_id, message, picture=None, link=None, name=None, caption=None):
+    """
+    Posts a wall feed. 
+    branch: /PROFILE_ID/feed
+    """
+    param = {"access_token": app_access_token,
+             "message": message,
+             "link": link,
+             "name": name,
+             "caption": caption,
+             }
+    print param
+    request = ReSTRequest.new(FACEBOOK_GRAPH_API_URL, "POST", param)
+    request.send("/"+profile_id+"/feed")
 
 def get_app_access_token(app_id, app_secret):
     """
@@ -49,7 +77,7 @@ def create_test_user(app_id, app_xs_token):
              "name": random_letters()[:5],
              "method": "post",
              "access_token": app_xs_token,
-             "permissions": PERMISSIONS
+             "permissions": TEST_PERMISSIONS,
              }
     
     request = ReSTRequest.new(FACEBOOK_GRAPH_API_URL, "post", param)
@@ -115,10 +143,4 @@ class FacebookApi:
         self.friends = req.json_data()
         self.friends_raw = req.data
         return self.friends
-    
-    def post_own_wall(self):
-        pass
-    
-    def post_wall(self):
-        pass
 
