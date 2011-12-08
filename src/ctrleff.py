@@ -2,8 +2,7 @@
 # backend for ctrleff
 #===============================================================================
 from flask import Flask
-from local_config import API_TO_REGISTER
-import api 
+from local_config import API_TO_REGISTER 
 
 #utils
 
@@ -20,7 +19,6 @@ def get_app(static=None):
     factory for app
     """
     if static:
-        #static var
         return static
     
     app =  Flask(__name__)
