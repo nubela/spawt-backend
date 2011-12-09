@@ -42,7 +42,7 @@ def add_checkpoint_to_user(user_obj, checkpoint_obj):
     db.session.commit()
     
     return user_checkpoint
-
+    
 def add_existing_checkpoint_to_user(user_obj, user_checkpoint_obj):
     """
     Duplicates a record of an instance of <<UserCheckpoint>> and gives it to
