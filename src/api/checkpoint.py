@@ -88,13 +88,6 @@ def update_checkpoint(checkpoint_id, **kwargs):
                     "status": "unimplemented"
                     })
 
-def new_share(checkpoint_id, user_from, user_to):
-    """
-    (PUT: checkpoint)
-    instantiates a share from a user to his facebook friend (be it a ctrleff user or not)
-    """
-    pass
-
 def new_like(checkpoint_id, user_from):
     """
     (PUT: like)
@@ -120,10 +113,6 @@ def _register_api(app):
     
     #app.add_url_rule('/checkpoint/', 
     #                 "update_checkpoint", update_checkpoint, methods=['POST'])
-    
-    #share endpoints
-    #app.add_url_rule('/share/', 
-    #                 "new_share", new_share, methods=['PUT'])
     
     #like endpoints
     #app.add_url_rule('/like/', 
