@@ -32,7 +32,6 @@ def post_on_wall(app_access_token, profile_id, message, picture=None, link=None,
              "name": name,
              "caption": caption,
              }
-    print param
     request = ReSTRequest.new(FACEBOOK_GRAPH_API_URL, "POST", param)
     request.send("/"+profile_id+"/feed")
 

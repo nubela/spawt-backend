@@ -25,7 +25,8 @@ def get_like_w_attr(user_obj, checkpoint_obj):
 
 def add_like(user_obj, checkpoint_obj):
     """
-    Instantiates a new Like record between a user and a Checkpoint
+    Instantiates a new Like record between a user and a Checkpoint,
+    returns it if it already exists
     """
     
     like_obj = get_like_w_attr(user_obj, checkpoint_obj)
@@ -34,7 +35,7 @@ def add_like(user_obj, checkpoint_obj):
     
     from db import Like, db
     
-    like_obj = Like
+    like_obj = Like()
     like_obj.checkpoint_id = checkpoint_obj.id
     like_obj.timestamp = datetime.datetime.now()
     like_obj.user_id = user_obj.id
