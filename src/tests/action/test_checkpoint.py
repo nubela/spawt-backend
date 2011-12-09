@@ -2,12 +2,12 @@
 # unit tests for Checkpoint action layer
 #===============================================================================
 
-from tests.test_base import TestBase
 from action.user import save_user
 from action.location import add_location
 from util.util import random_string
 import datetime
 from action.checkpoint import add_checkpoint, get_checkpoint
+from tests.util.test_base import TestBase
 
 class CheckpointTests(TestBase):
 

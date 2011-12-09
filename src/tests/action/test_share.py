@@ -1,7 +1,7 @@
 #===============================================================================
 # unit tests for share action layer
 #===============================================================================
-from tests.test_base import TestBase
+
 from facebook.facebook import get_app_access_token, create_test_user,\
     make_friend_connection, get_wall_posts
 from local_config import APP_ID, APP_SECRET
@@ -12,6 +12,7 @@ from action.checkpoint import add_checkpoint
 from action.location import add_location
 from tests.action.test_checkpoint import CheckpointTests
 import time
+from tests.util.test_base import TestBase
 
 class ShareTests(TestBase):
     

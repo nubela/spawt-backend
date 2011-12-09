@@ -5,8 +5,12 @@ import os
 from local_config import APP_ID, APP_SECRET
 from facebook.facebook import get_app_access_token, create_test_user,\
     delete_all_test_users
+from util.util import random_string
+from collections import namedtuple
 
 class TestBase(unittest.TestCase):
+
+    User = namedtuple("User", ("authcode", "fb_test_user", "fb_info", "user_obj", "checkpoint_obj", "user_checkpoint_obj"))
     
     def setUp(self):
         self.app = get_app()
@@ -36,40 +40,33 @@ class TestBase(unittest.TestCase):
         return create_test_user(APP_ID, self.get_app_access_token())
     
     def create_saved_test_user(self):
-        from util.util import random_string
         from action.user import save_user
-        from collections import namedtuple
         
         #create and save fb user
         authcode = random_string()
         test_user = self.create_facebook_test_user()
         fb_info, user = save_user(test_user["access_token"], authcode)
         
-        User = namedtuple("User", ("authcode", "fb_test_user", "fb_info", "user_obj", "checkpoint_obj", "user_checkpoint_obj"))
-        return User(authcode, test_user, fb_info, user)
+        return self.User(authcode, test_user, fb_info, user, None, None)
     
     def create_saved_test_user_with_checkpoint(self):
         """
         Creates a test user, with a checkpoint
         """
-        from collections import namedtuple
-        from util.util import random_string
-        from action.user import save_user
         from tests.action.test_checkpoint import CheckpointTests
         from action.checkpoint import add_checkpoint
         from action.user_checkpoint import add_checkpoint_to_user
         
-        #create and save fb user
-        authcode = random_string()
-        test_user = self.create_facebook_test_user()
-        fb_info, user = save_user(test_user["access_token"], authcode)
+        user = self.create_saved_test_user()
         
         #create user checkpoint
-        mock_cp_data = CheckpointTests.mock_checkpoint_data(user.id)
+        mock_cp_data = CheckpointTests.mock_checkpoint_data(user.user_obj.id)
         checkpoint = add_checkpoint(*mock_cp_data)
-        user_checkpoint = add_checkpoint_to_user(user, checkpoint)
+        user_checkpoint = add_checkpoint_to_user(user.user_obj, checkpoint)
         
-        #create namedtuple to store
-        User = namedtuple("User", ("authcode", "fb_test_user", "fb_info", "user_obj", "checkpoint_obj", "user_checkpoint_obj"))
-        return User(authcode, test_user, fb_info, user, checkpoint, user_checkpoint)
-        
+        return self.User(user.authcode, 
+                         user.fb_test_user, 
+                         user.fb_info, 
+                         user.user_obj, 
+                         checkpoint, 
+                         user_checkpoint)

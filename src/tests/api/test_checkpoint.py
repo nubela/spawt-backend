@@ -1,4 +1,3 @@
-from tests.test_base import TestBase
 from ctrleff import get_resources_abs_path
 from os.path import join
 from action.user import save_user
@@ -6,6 +5,7 @@ from util.util import random_string
 from action.authorization import gen_signature, gen_api_key
 from action.location import get_location
 import base64
+from tests.util.test_base import TestBase
 
 class CheckpointAPITests(TestBase):
     

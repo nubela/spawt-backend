@@ -1,8 +1,9 @@
 #===============================================================================
 # unit tests for location action layer
 #===============================================================================
-from tests.test_base import TestBase
+
 from action.location import add_location, get_location
+from tests.util.test_base import TestBase
 
 class LocationTests(TestBase):
     

@@ -3,10 +3,10 @@ from action.user import get_user
 from action.user_checkpoint import get_user_checkpoint
 from action.authorization import is_api_key_validated
 from api.common_lib import authorization_fail
-from action import share
 from flask.helpers import jsonify
+from action.share import share
 
-def new_share(checkpoint_id, user_from, user_to):
+def new_share():
     """
     (PUT: checkpoint)
     instantiates a share from a user to his facebook friend (be it a ctrleff user or not)
