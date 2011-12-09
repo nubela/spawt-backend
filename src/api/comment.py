@@ -44,3 +44,11 @@ def new_comment():
                                "comment_id": comment.id
                                }
                     })
+    
+def _register_api(app):
+    """
+    interface method so the app can register the API (routing) calls.
+    """
+    
+    app.add_url_rule('/comment/', 
+                     "new_comment", new_comment, methods=['PUT'])
