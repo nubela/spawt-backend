@@ -85,15 +85,19 @@ class UserCheckpointOptions(db.Model):
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship("User")
     comment = db.Column(db.String(255))
     timestamp = db.Column(db.DateTime)
-    checkpoint = db.Column(db.Integer, db.ForeignKey('checkpoint.id'))
+    checkpoint_id = db.Column(db.Integer, db.ForeignKey('checkpoint.id'))
+    checkpoint = db.relationship("Checkpoint")
 
 class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    checkpoint = db.Column(db.Integer, db.ForeignKey('checkpoint.id'))
-    user = db.Column(db.Integer, db.ForeignKey('user.id'))
+    checkpoint_id = db.Column(db.Integer, db.ForeignKey('checkpoint.id'))
+    checkpoint = db.relationship("Checkpoint")
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship("User")
     timestamp = db.Column(db.DateTime)
     
 class Share(db.Model):
