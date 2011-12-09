@@ -13,40 +13,17 @@ class CatalogAPITests(TestBase):
         """
         tests add_checkpoint_to_catalog()
         """
+
+        user_with_checkpoint = self.create_saved_test_user_with_checkpoint()
+        user_for_catalog_add = self.create_saved_test_user()
         
-        #create a user that created its own checkpointA
-        authcode = "someauthcode"
-        test_user = self.create_facebook_test_user()
-        fb_info, user = save_user(test_user["access_token"], authcode)
-        
-        image_path = join(get_resources_abs_path(), "test/images/timbre.jpg")
-        image_file = open(image_path, "r")
-        image = base64.encodestring(image_file.read())
-        
-        data = {"user_id":user.id,
-                "signature": gen_signature(authcode, "put", "checkpoint", gen_api_key(authcode, user.id)),
-                "name": random_string(),
-                "longitude": 2.0,
-                "latitude": 1.0,
-                "description": random_string(),
-                "price": 3.0,
-                "image": image,
-                "type:": "play", 
-                }
-        
-        response = self.client.put("/checkpoint/", data=data)
-        assert "user_checkpoint_id" in response.data
-        
-        #create another user that wants to add checkpointA to its catalog
-        response_json = simplejson.loads(response.data)
-        user_checkpoint_id_to_add =  response_json["result"]["user_checkpoint_id"]
-        
-        test_user_b = self.create_facebook_test_user()
-        fb_info_b, user_b = save_user(test_user_b["access_token"], authcode)
-        
-        data = {"user_id": user_b.id,
-                "signature": gen_signature(authcode, "post", "catalog", gen_api_key(authcode, user_b.id)),
-                "user_checkpoint_id": user_checkpoint_id_to_add 
+        data = {"user_id": user_for_catalog_add.user_obj.id,
+                "signature": gen_signature(user_for_catalog_add.authcode, 
+                                           "post", 
+                                           "catalog", 
+                                           gen_api_key(user_for_catalog_add.authcode, 
+                                                       user_for_catalog_add.user_obj.id)),
+                "user_checkpoint_id": user_with_checkpoint.user_checkpoint_obj.id, 
                 }
         
         response = self.client.post("/catalog/", data=data)
