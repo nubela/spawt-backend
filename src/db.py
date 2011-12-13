@@ -6,11 +6,6 @@ app = get_app()
 app.config['SQLALCHEMY_DATABASE_URI'] = SQL_URI
 db = SQLAlchemy(app)
 
-class Location(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    longitude = db.Column(db.Float)
-    latitude = db.Column(db.Float)
-
 class FacebookUser(db.Model):
     id = db.Column(db.String(255), primary_key=True)
     name = db.Column(db.String(255))
@@ -34,15 +29,15 @@ class User(db.Model):
 class Checkpoint(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
-    location = db.Column(db.String(255), db.ForeignKey('location.id'))
     name = db.Column(db.String(255))
     description = db.Column(db.String(255), nullable=True)
-    #tell_a_friend = db.Column(db.String(255), nullable=True)
     price = db.Column(db.Float, nullable=True)
     expiry = db.Column(db.DateTime, nullable=True)
     date_created = db.Column(db.DateTime)
     type = db.Column(db.String(255))
     image = db.Column(db.String(255))
+    longitude = db.Column(db.Float)
+    latitude = db.Column(db.Float)
     
 class FriendConnection(db.Model):
     """

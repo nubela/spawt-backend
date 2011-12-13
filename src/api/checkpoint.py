@@ -43,10 +43,9 @@ def _checkpoints_near_me():
     (does not return notifications, etc, those belong to the `update` API)
     """
     user_id = request.form.get("user_id")
-    user = get_user((user_id)
-    langitude = request.form.get("langitude")
+    user = get_user(user_id)
+    latitude = request.form.get("latitude")
     longitude = request.form.get("longitude")
-    
     
 def _my_checkpoints():
     pass
@@ -93,9 +92,7 @@ def new_checkpoint():
     upload_dir = join(get_resources_abs_path(), "uploads")
     img_file_name = save_file(image_encoded, ".jpg", str(user.id), upload_dir)
     
-    #create checkpoint
-    location = add_location(longitude, latitude)
-    checkpoint = add_checkpoint(user_id, location.id, name, type, img_file_name, description, price, expiry)
+    checkpoint = add_checkpoint(user_id, name, type, img_file_name, longitude, latitude, description, price, expiry)
     user_checkpoint  = add_checkpoint_to_user(user, checkpoint)
     
     #dispatch shares

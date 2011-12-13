@@ -75,3 +75,39 @@ def add_existing_checkpoint_to_user(user_obj, user_checkpoint_obj):
     db.session.commit()
     
     return duplicated_ucp
+
+def checkpoints_by_proximity(user, location_coord, max_friends_cp=50, max_anon_cp=50):
+    """
+    return nearby checkpoint objects from friends and anonymous users sorted by proximity 
+    """
+    from db import Checkpoint, db
+    longitude = location_coord[1]
+    latitude = location_coord[0]
+    
+    #get nearby friends checkpoints
+    friend_cp = []
+    exp_gen = exp()
+    exp_no = exp_gen.next()
+    while len(friend_cp) < max_friends_cp:
+        coord_conditions = and_(Checkpoint.longitude <= longitude + exp_no,
+                                Checkpoint.longitude >= longitude - exp_no,
+                                Checkpoint.latitude <= latitude + exp_no,
+                                Checkpoint.latitude >= latitude - exp_no,
+                                )
+        friend_cp = Checkpoint.query.filter(coord_conditions).all()
+        exp_no = exp_gen.next()
+    objects = _checkpoints_to_location_namedtuples(friend_cp) 
+    sorted_friend_cp = proximity_sort(location_coord, objects, max_friends_cp)
+    
+    #get nearby anon checkpoints
+    anon_cp = []
+    exp_gen = exp()
+    exp_no = exp_gen.next()
+    
+    
+def _checkpoints_to_location_namedtuples(lis_of_cp):
+    Obj = namedtuple("Obj", ("location", "checkpoint"))
+    lis = []
+    for cp in lis_of_cp:
+        lis += [Obj((cp.latitude, cp.longitude), cp)]
+    return lis

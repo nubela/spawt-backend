@@ -1,8 +1,8 @@
 #===============================================================================
 # geo library
-# coordinates are represented by a tuple in the format (lang, long)
+# coordinates are represented by a tuple in the format (lat, long)
 #===============================================================================
-from util.kdtree import KDTree #@UnresolvedImport
+from kdtree import KDTree
 
 def proximity_sort(point, objects, n_total):
     """

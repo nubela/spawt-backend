@@ -1,6 +1,10 @@
 """
 Action layer for manipulation of Checkpoints
 """
+from sqlalchemy.sql.expression import and_
+from util.util import exp
+from util.geo import proximity_sort
+from collections import namedtuple
 def get_checkpoint(id):
     """
     Gets the relevant Checkpoint from Database with the given ID
@@ -11,7 +15,7 @@ def get_checkpoint(id):
         return cp.first()
     return None
 
-def add_checkpoint(creator_id, location_id, name, type, image, description=None, price=None, expiry=None):
+def add_checkpoint(creator_id, name, type, image, longitude, latitude, description=None, price=None, expiry=None):
     """
     Creates a Checkpoint record in the database with the supplied arguments
     """
@@ -20,7 +24,8 @@ def add_checkpoint(creator_id, location_id, name, type, image, description=None,
 
     checkpoint = Checkpoint()
     checkpoint.creator = creator_id
-    checkpoint.location = location_id
+    checkpoint.longitude = longitude
+    checkpoint.latitude = latitude
     checkpoint.name = name
     checkpoint.description = description
     checkpoint.price = price
@@ -32,12 +37,3 @@ def add_checkpoint(creator_id, location_id, name, type, image, description=None,
     db.session.commit() 
     
     return checkpoint
-
-def checkpoints_by_proximity(user, location_coord, max_friends_cp=50, max_anon_cp=50):
-    """
-    return nearby checkpoint objects from friends and anonymous users sorted by proximity 
-    """
-    from db import Checkpoint, db
-    
-    #get nearby friends checkpoints
-    checkpoint = Checkpoint.query

@@ -13,14 +13,13 @@ class CheckpointTests(TestBase):
 
     @staticmethod
     def mock_checkpoint_data(creator_user_id):
-        location = add_location(2.0, 3.0)
         name = random_string()
         desc = random_string()
         price = 1.0
         expiry = datetime.datetime.now()
         type = "play"
         image = "bla_image"
-        return (creator_user_id, location.id, name, type, image, desc, price, expiry)
+        return (creator_user_id, name, type, image, 2.0, 3.0, desc, price, expiry)
     
     def test_add_checkpoint(self):
         """
