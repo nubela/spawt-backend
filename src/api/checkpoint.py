@@ -5,7 +5,8 @@ from flask.globals import request
 import datetime
 from ctrleff import get_app, get_resources_abs_path
 from flask.helpers import jsonify
-from api.common_lib import authorization_fail
+from api.common_lib import authorization_fail, missing_field_fail,\
+    authorization_required, authorize
 import simplejson
 from action.authorization import is_api_key_validated
 from action.user import get_user
@@ -16,6 +17,39 @@ from action.share import share
 import base64
 from os.path import join
 from action import user_checkpoint
+
+def get_checkpoint():
+    """
+    (GET: checkpoint)
+    """
+    authorize("get", "checkpoint")
+    
+    longitude = request.form.get("type")
+    
+    if type == "search":
+        return _search_checkpoints()
+    elif type == "near":
+        return _checkpoints_near_me()
+    elif type == "mine":
+        return _my_checkpoints()
+    return missing_field_fail()
+    
+def _search_checkpoints():
+    pass
+
+def _checkpoints_near_me():
+    """
+    return checkpoints given a location, from both friends/anonymous
+    (does not return notifications, etc, those belong to the `update` API)
+    """
+    user_id = request.form.get("user_id")
+    user = get_user((user_id)
+    langitude = request.form.get("langitude")
+    longitude = request.form.get("longitude")
+    
+    
+def _my_checkpoints():
+    pass
 
 def new_checkpoint():
     """
@@ -88,36 +122,13 @@ def update_checkpoint(checkpoint_id, **kwargs):
                     "status": "unimplemented"
                     })
 
-def new_like(checkpoint_id, user_from):
-    """
-    (PUT: like)
-    instantiates a like from a user onto a checkpoint
-    """
-    pass
-
-def new_comment(checkpoint_id, user_from, comment):
-    """
-    (PUT: comment)
-    instantiates a comment from a user onto a checkpoint
-    """
-    pass
-
 def _register_api(app):
     """
     interface method so the app can register the API (routing) calls.
     """
     
-    #checkpoint endpoints
     app.add_url_rule('/checkpoint/', 
                      "new_checkpoint", new_checkpoint, methods=['PUT'])
     
-    #app.add_url_rule('/checkpoint/', 
-    #                 "update_checkpoint", update_checkpoint, methods=['POST'])
-    
-    #like endpoints
-    #app.add_url_rule('/like/', 
-    #                 "new_like", new_like, methods=['PUT'])
-    
-    #comment endpoints
-    #app.add_url_rule('/comment/', 
-    #                 "new_comment", new_comment, methods=['PUT'])
+    app.add_url_rule('/checkpoint/', 
+                     "get_checkpoints", get_checkpoint, methods=['GET'])

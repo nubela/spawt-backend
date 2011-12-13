@@ -34,7 +34,7 @@ class User(db.Model):
 class Checkpoint(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
-    location = db.Column(db.String(255), db.ForeignKey('facebook_user.id'))
+    location = db.Column(db.String(255), db.ForeignKey('location.id'))
     name = db.Column(db.String(255))
     description = db.Column(db.String(255), nullable=True)
     #tell_a_friend = db.Column(db.String(255), nullable=True)
@@ -112,3 +112,15 @@ class Share(db.Model):
     user_checkpoint_id = db.Column(db.Integer, db.ForeignKey('user_checkpoint.id'))
     user_checkpoint = db.relationship("UserCheckpoint")
     timestamp = db.Column(db.DateTime)
+    
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(255))
+    from_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    from_user = db.relationship("User", primaryjoin="Notification.from_user_id==User.id") 
+    to_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    to_user = db.relationship("User", primaryjoin="Notification.to_user_id==User.id")
+    relevant_id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(255))
+    fresh = db.Column(db.Boolean)  
+    

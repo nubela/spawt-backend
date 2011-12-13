@@ -32,3 +32,12 @@ def add_checkpoint(creator_id, location_id, name, type, image, description=None,
     db.session.commit() 
     
     return checkpoint
+
+def checkpoints_by_proximity(user, location_coord, max_friends_cp=50, max_anon_cp=50):
+    """
+    return nearby checkpoint objects from friends and anonymous users sorted by proximity 
+    """
+    from db import Checkpoint, db
+    
+    #get nearby friends checkpoints
+    checkpoint = Checkpoint.query
