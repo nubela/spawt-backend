@@ -19,7 +19,7 @@ class FacebookUser(db.Model):
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255))
-    facebook_info = db.Column(db.String(255), db.ForeignKey('facebook_user.id'))
+    facebook_user_id = db.Column(db.String(255), db.ForeignKey('facebook_user.id'))
     facebook_user = db.relationship("FacebookUser")
     
     #authentication 

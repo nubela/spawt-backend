@@ -4,9 +4,10 @@ import tempfile
 import os
 from local_config import APP_ID, APP_SECRET
 from facebook.facebook import get_app_access_token, create_test_user,\
-    delete_all_test_users
+    delete_all_test_users, make_friend_connection
 from util.util import random_string
 from collections import namedtuple
+from action.user import update_social_graph
 
 class TestBase(unittest.TestCase):
 
@@ -51,7 +52,7 @@ class TestBase(unittest.TestCase):
     
     def create_saved_test_user_with_checkpoint(self):
         """
-        Creates a test user, with a checkpoint
+        Creates a test user, user1_idwith a checkpoint
         """
         from tests.action.test_checkpoint import CheckpointTests
         from action.checkpoint import add_checkpoint
@@ -70,3 +71,9 @@ class TestBase(unittest.TestCase):
                          user.user_obj, 
                          checkpoint, 
                          user_checkpoint)
+        
+    def befriend_test_user(self, user, user_lis):
+        for u in user_lis:
+            make_friend_connection(user.user_obj.facebook_user.id, u.user_obj.facebook_user.id, user.user_obj.access_token, u.user_obj.access_token)
+            update_social_graph(u.user_obj.access_token, u.user_obj.facebook_user)
+        update_social_graph(user.user_obj.access_token, user.user_obj.facebook_user)
