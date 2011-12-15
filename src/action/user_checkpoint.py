@@ -1,6 +1,8 @@
 #===============================================================================
 # UserCheckpoint action layer 
 #===============================================================================
+from util.geo import bounding_box
+from sqlalchemy.sql.expression import and_
 
 def get_user_checkpoint(id):
     """
@@ -75,35 +77,30 @@ def add_existing_checkpoint_to_user(user_obj, user_checkpoint_obj):
     db.session.commit()
     
     return duplicated_ucp
-
-def checkpoints_by_proximity(user, location_coord, max_friends_cp=50, max_anon_cp=50):
+    
+def get_nearby_checkpoints(user_obj, point_coord, radius_in_kilometres):
     """
-    return nearby checkpoint objects from friends and anonymous users sorted by proximity 
+    get UserCheckpoints in a given radius sorted according to proximity
     """
-    from db import Checkpoint, db
-    longitude = location_coord[1]
-    latitude = location_coord[0]
+    from db import UserCheckpoint, db, Checkpoint
     
-    #get nearby friends checkpoints
-    friend_cp = []
-    exp_gen = exp()
-    exp_no = exp_gen.next()
-    while len(friend_cp) < max_friends_cp:
-        coord_conditions = and_(Checkpoint.longitude <= longitude + exp_no,
-                                Checkpoint.longitude >= longitude - exp_no,
-                                Checkpoint.latitude <= latitude + exp_no,
-                                Checkpoint.latitude >= latitude - exp_no,
-                                )
-        friend_cp = Checkpoint.query.filter(coord_conditions).all()
-        exp_no = exp_gen.next()
-    objects = _checkpoints_to_location_namedtuples(friend_cp) 
-    sorted_friend_cp = proximity_sort(location_coord, objects, max_friends_cp)
+    #bounding box
+    lat, lon = point_coord[0], point_coord[1]
+    dlat, dlon = bounding_box(lat, lon, radius_in_kilometres)
+    min_lat, max_lat = lat-dlat, lat+dlat
+    min_lon, max_lon = lon-dlon, lon+dlon
     
-    #get nearby anon checkpoints
-    anon_cp = []
-    exp_gen = exp()
-    exp_no = exp_gen.next()
+    radius_cond = and_(Checkpoint.latitude <= max_lat,
+                       Checkpoint.latitude >= min_lat,
+                       Checkpoint.longitude <= max_lon,
+                       Checkpoint.longitude >= min_lon
+                       )
     
+    ucp_in_radius = (db.session.query(UserCheckpoint).
+                     join(UserCheckpoint.checkpoint).
+                     filter(radius_cond))
+    
+    return ucp_in_radius.all()
     
 def _checkpoints_to_location_namedtuples(lis_of_cp):
     Obj = namedtuple("Obj", ("location", "checkpoint"))

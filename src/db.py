@@ -1,6 +1,7 @@
 from ctrleff import get_app
 from flaskext.sqlalchemy import SQLAlchemy
 from local_config import SQL_URI
+from sqlalchemy.dialects.mysql.base import DOUBLE
 
 app = get_app()
 app.config['SQLALCHEMY_DATABASE_URI'] = SQL_URI
@@ -36,8 +37,8 @@ class Checkpoint(db.Model):
     date_created = db.Column(db.DateTime)
     type = db.Column(db.String(255))
     image = db.Column(db.String(255))
-    longitude = db.Column(db.Float)
-    latitude = db.Column(db.Float)
+    longitude = db.Column(DOUBLE)
+    latitude = db.Column(DOUBLE)
     
 class FriendConnection(db.Model):
     """

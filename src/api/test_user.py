@@ -11,7 +11,7 @@ from tests.util.test_base import TestBase
 
 class UserTests(TestBase):
     
-    def atest_save_user(self):
+    def test_save_user(self):
         #create test user with 3 friends
         app_xs_token = get_app_access_token(APP_ID, APP_SECRET)
         test_user = create_test_user(APP_ID, app_xs_token)
