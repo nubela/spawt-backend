@@ -31,9 +31,6 @@ def update_social_graph(access_token, fb_user=None):
     if not fb_user:
         fb_user = get_facebook_user(fb_api.get_info()["id"])
     
-    print "printing friends:"
-    print all_friends
-    
     #save friends into db
     for friend in all_friends["data"]:
         fb_friend = addupdate_facebook_user(friend["id"], friend["name"], None, None, None, None, None, None)
