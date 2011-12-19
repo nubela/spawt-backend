@@ -114,9 +114,9 @@ class Notification(db.Model):
     type = db.Column(db.String(255))
     from_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     from_user = db.relationship("User", primaryjoin="Notification.from_user_id==User.id") 
-    to_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    to_user = db.relationship("User", primaryjoin="Notification.to_user_id==User.id")
+    affected_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    affected_user = db.relationship("User", primaryjoin="Notification.affected_user_id==User.id")
     relevant_id = db.Column(db.Integer, primary_key=True)
-    description = db.Column(db.String(255))
+    description = db.Column(db.String(255), nullable=True)
+    timestamp = db.Column(db.DateTime)
     fresh = db.Column(db.Boolean)  
-    

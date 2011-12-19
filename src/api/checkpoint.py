@@ -36,7 +36,16 @@ def get_checkpoint():
     return missing_field_fail()
     
 def _search_checkpoints():
-    pass
+    """
+    A simple implementation of keyword search for Checkpoint.
+    Append a wildcard to the left and right of the phrase, and search
+    Checkpoint's Description, Name, and User's name (Facebook name) 
+    """
+    user_id = request.form.get("user_id")
+    user = get_user(user_id)
+    search_term = request.form.get("keyword").strip()
+    
+    pass    
 
 def _checkpoints_near_me():
     """

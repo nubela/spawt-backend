@@ -3,7 +3,8 @@
 #===============================================================================
 from tests.util.test_base import TestBase
 from action.user_checkpoint import get_nearby_checkpoints,\
-    add_checkpoint_to_user, get_my_checkpoints
+    add_checkpoint_to_user, get_my_checkpoints,\
+    get_recent_friend_user_checkpoints
 from tests.action.test_checkpoint import CheckpointTests
 from action.checkpoint import add_checkpoint
 
@@ -47,3 +48,15 @@ class UserCheckpointActionTests(TestBase):
         """
         user = self.create_saved_test_user_with_checkpoint()
         assert len(get_my_checkpoints(user.user_obj)) == 1
+        
+    def test_get_recent_friend_user_checkpoints(self):
+        """
+        unit test for get_recent_friend_user_checkpoints()
+        """
+        user_a = self.create_saved_test_user()
+        user_b = self.create_saved_test_user_with_checkpoint()
+        self.befriend_test_user(user_a, [user_b])
+        
+        recent_ucp = get_recent_friend_user_checkpoints(user_a.user_obj)
+        
+        assert len(recent_ucp) == 1

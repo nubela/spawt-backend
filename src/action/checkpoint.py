@@ -5,6 +5,10 @@ from sqlalchemy.sql.expression import and_
 from util.util import exp
 from util.geo import proximity_sort
 from collections import namedtuple
+import datetime
+
+CHECKPOINT_TYPES = ("food", "shop", "play")
+
 def get_checkpoint(id):
     """
     Gets the relevant Checkpoint from Database with the given ID
@@ -30,6 +34,7 @@ def add_checkpoint(creator_id, name, type, image, longitude, latitude, descripti
     checkpoint.description = description
     checkpoint.price = price
     checkpoint.expiry = expiry
+    checkpoint.date_created = datetime.datetime.now()
     checkpoint.type = type
     checkpoint.image = image
      

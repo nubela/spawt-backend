@@ -11,7 +11,7 @@ from tests.util.test_base import TestBase
 
 class UserTests(TestBase):
     
-    def a_test_save_user(self):
+    def test_save_user(self):
         #create test user with 3 friends
         app_xs_token = get_app_access_token(APP_ID, APP_SECRET)
         test_user = create_test_user(APP_ID, app_xs_token)
@@ -31,7 +31,7 @@ class UserTests(TestBase):
         from db import FriendConnection
         assert FriendConnection.query.filter_by(fb_user_from=user.facebook_user.id).count() == 3    
         
-    def a_test_update_social_graph(self):
+    def test_update_social_graph(self):
         user_a = self.create_saved_test_user()
         user_b = self.create_saved_test_user()
         self.befriend_test_user(user_a, [user_b])

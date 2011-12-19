@@ -5,6 +5,9 @@ from util.geo import bounding_box, proximity_sort
 from sqlalchemy.sql.expression import and_
 from action.user import get_friends
 from collections import namedtuple
+from action.checkpoint import CHECKPOINT_TYPES
+from action.common import _get_2_weeks_date_before
+from sqlalchemy.orm.util import aliased
 
 def get_user_checkpoint(id):
     """
@@ -125,6 +128,41 @@ def get_my_checkpoints(user_obj):
     from db import UserCheckpoint
     ucp = UserCheckpoint.query.filter_by(user_id=user_obj.id)
     return ucp.all() 
+
+def get_recent_friend_user_checkpoints(user_obj, cut_off_date=_get_2_weeks_date_before()):
+    """
+    (faux notification) returns Checkpoints that were recently created by friends
+    """
+    from db import UserCheckpoint, db, FacebookUser, User, FriendConnection, Checkpoint
+    
+    FriendUserCheckpoint, FriendFacebookUser, FriendUser = aliased(UserCheckpoint), aliased(FacebookUser), aliased(User)
+    q = (db.session.query(UserCheckpoint).
+         join(Checkpoint, Checkpoint.id == UserCheckpoint.checkpoint_id).
+         join(FriendUser, FriendUser.id == UserCheckpoint.user_id).
+         join(FriendFacebookUser, FriendFacebookUser.id == FriendUser.facebook_user_id).
+         join(FriendConnection, FriendConnection.fb_user_to == FriendFacebookUser.id).
+         join(FacebookUser, FacebookUser.id == FriendConnection.fb_user_from).
+         join(User, User.facebook_user_id == FacebookUser.id).
+         filter(User.id == user_obj.id).
+         filter(Checkpoint.date_created > cut_off_date).
+         filter(Checkpoint.creator == FriendUser.id)        
+         )
+    
+    return q.all()
+
+def user_checkpoint_sanify(ucp_collection):
+    """
+    sanify a <<UserCheckpoint>> collection for jsonify-ication
+    by separating it by Checkpoint Types 
+    """
+    separated = {}
+    for ucp in ucp_collection:
+        if ucp.checkpoint.type.lower() in CHECKPOINT_TYPES:
+            if ucp.checkpoint.type.lower() in separated:
+                separated[ucp.checkpoint.type.lower()] += [ucp]
+            else: 
+                separated[ucp.checkpoint.type.lower()] = [ucp]
+    return separated
 
 def _checkpoints_to_location_namedtuples(lis_of_cp):
     Obj = namedtuple("Obj", ("location", "user_checkpoint"))
