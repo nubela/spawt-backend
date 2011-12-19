@@ -118,6 +118,14 @@ def get_nearby_checkpoints(user_obj, point_coord, radius_in_kilometres):
             
     return friends, anon
 
+def get_my_checkpoints(user_obj):
+    """
+    get all UserCheckpoints belonging to a user
+    """
+    from db import UserCheckpoint
+    ucp = UserCheckpoint.query.filter_by(user_id=user_obj.id)
+    return ucp.all() 
+
 def _checkpoints_to_location_namedtuples(lis_of_cp):
     Obj = namedtuple("Obj", ("location", "user_checkpoint"))
     lis = []

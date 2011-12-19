@@ -13,7 +13,7 @@ from action.user import get_user
 from action.checkpoint import add_checkpoint
 from action.location import add_location
 from action.user_checkpoint import add_checkpoint_to_user,\
-    get_nearby_checkpoints
+    get_nearby_checkpoints, get_my_checkpoints
 from action.share import share
 import base64
 from os.path import join
@@ -56,6 +56,9 @@ def _my_checkpoints():
     return all user checkpoints that belong to user
     as well as notifications on new comments, etc.
     """
+    user_id = request.form.get("user_id")
+    user = get_user(user_id)
+    return get_my_checkpoints(user)
 
 def new_checkpoint():
     """

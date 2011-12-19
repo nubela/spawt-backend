@@ -3,7 +3,7 @@
 #===============================================================================
 from tests.util.test_base import TestBase
 from action.user_checkpoint import get_nearby_checkpoints,\
-    add_checkpoint_to_user
+    add_checkpoint_to_user, get_my_checkpoints
 from tests.action.test_checkpoint import CheckpointTests
 from action.checkpoint import add_checkpoint
 
@@ -40,3 +40,10 @@ class UserCheckpointActionTests(TestBase):
         assert a1_ucp in friends_ucp
         assert not a2_ucp in friends_ucp
         assert a3_ucp in anon_ucp
+        
+    def test_my_checkpoints(self):
+        """
+        unit test for get_my_checkpoints()
+        """
+        user = self.create_saved_test_user_with_checkpoint()
+        assert len(get_my_checkpoints(user.user_obj)) == 1
