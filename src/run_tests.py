@@ -1,7 +1,7 @@
 #-- unit tests that needs automation --#
 #from tests.action.test_share import ShareTests
 
-#from api.test_user import UserTests
+from api.test_user import UserTests
 #from tests.action.test_checkpoint import CheckpointTests
 #from tests.api.test_checkpoint import CheckpointAPITests
 #from tests.api.test_catalog import CatalogAPITests

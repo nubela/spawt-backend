@@ -1,6 +1,7 @@
 from facebook.facebook import FacebookApi
 from action.facebook_user import addupdate_facebook_user, get_facebook_user
 from action.friend_connection import add_friend_connection
+from sqlalchemy.orm.util import aliased
 
 def save_user(access_token, auth_code):
     """
@@ -69,3 +70,23 @@ def addupdate_user(fb_user, email, access_token, auth_code):
         db.session.commit()
     
     return user
+
+def get_friends(user_obj):
+    """
+    returns a list of <<User>> objects
+    """
+    from db import db, User, FriendConnection, FacebookUser
+    
+    FriendFacebookUser, FriendUser = aliased(FacebookUser), aliased(User)
+    friends_q = (db.session.query(User, FriendUser).
+               join(FacebookUser, FacebookUser.id == User.facebook_user_id).
+               join(FriendConnection, FriendConnection.fb_user_from == FacebookUser.id).
+               join(FriendFacebookUser, FriendConnection.fb_user_to == FriendFacebookUser.id).
+               join(FriendUser, FriendUser.facebook_user_id == FriendFacebookUser.id)
+               )
+    friends_q = friends_q.filter(User.id == user_obj.id)
+    
+    friends = [f[1] for f in friends_q.all()]
+    friends += [user_obj]
+    
+    return friends

@@ -1,8 +1,10 @@
 #===============================================================================
 # UserCheckpoint action layer 
 #===============================================================================
-from util.geo import bounding_box
+from util.geo import bounding_box, proximity_sort
 from sqlalchemy.sql.expression import and_
+from action.user import get_friends
+from collections import namedtuple
 
 def get_user_checkpoint(id):
     """
@@ -81,6 +83,7 @@ def add_existing_checkpoint_to_user(user_obj, user_checkpoint_obj):
 def get_nearby_checkpoints(user_obj, point_coord, radius_in_kilometres):
     """
     get UserCheckpoints in a given radius sorted according to proximity
+    returns in tuple, (friends_user_checkpoints_list, anonymous_user_checkpoints_list)
     """
     from db import UserCheckpoint, db, Checkpoint
     
@@ -100,11 +103,24 @@ def get_nearby_checkpoints(user_obj, point_coord, radius_in_kilometres):
                      join(UserCheckpoint.checkpoint).
                      filter(radius_cond))
     
-    return ucp_in_radius.all()
+    ucp_namedtuples = _checkpoints_to_location_namedtuples(ucp_in_radius.all())
+    sorted_ucp = proximity_sort((lat, lon), ucp_namedtuples, ucp_in_radius.count())
     
+    #separate into friends and anon ucp
+    friend_list = get_friends(user_obj)
+    friends = []
+    anon = []
+    for ucp in sorted_ucp:
+        if ucp.user_checkpoint.user in friend_list:
+            friends += [ucp.user_checkpoint]
+        else:
+            anon += [ucp.user_checkpoint]
+            
+    return friends, anon
+
 def _checkpoints_to_location_namedtuples(lis_of_cp):
-    Obj = namedtuple("Obj", ("location", "checkpoint"))
+    Obj = namedtuple("Obj", ("location", "user_checkpoint"))
     lis = []
     for cp in lis_of_cp:
-        lis += [Obj((cp.latitude, cp.longitude), cp)]
+        lis += [Obj((float(cp.checkpoint.latitude), float(cp.checkpoint.longitude)), cp)]
     return lis

@@ -29,7 +29,7 @@ class TestBase(unittest.TestCase):
         #cleanup facebook test users
         if hasattr(self,"has_facebook_test_user"):
             app_xs_token = get_app_access_token(APP_ID, APP_SECRET)
-            #delete_all_test_users(APP_ID, self.get_app_access_token())
+            delete_all_test_users(APP_ID, self.get_app_access_token())
     
     def get_app_access_token(self):
         if not hasattr(self, "app_xs_token"):

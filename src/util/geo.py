@@ -14,7 +14,7 @@ def proximity_sort(point, objects, n_total):
     that returns a tuple of long,lang. returns `n_total` no of objects that are sorted 
     from nearest to furthest
     """
-    data_list = (o.location for o in objects)
+    data_list = [o.location for o in objects]
     sorted_location = _proximity_filter(point, data_list, n_total)
     sorted_obj = []
     for l in sorted_location:

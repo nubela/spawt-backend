@@ -12,7 +12,8 @@ from action.authorization import is_api_key_validated
 from action.user import get_user
 from action.checkpoint import add_checkpoint
 from action.location import add_location
-from action.user_checkpoint import add_checkpoint_to_user
+from action.user_checkpoint import add_checkpoint_to_user,\
+    get_nearby_checkpoints
 from action.share import share
 import base64
 from os.path import join
@@ -27,11 +28,11 @@ def get_checkpoint():
     longitude = request.form.get("type")
     
     if type == "search":
-        return _search_checkpoints()
+        result = _search_checkpoints()
     elif type == "near":
-        return _checkpoints_near_me()
+        result = _checkpoints_near_me()
     elif type == "mine":
-        return _my_checkpoints()
+        result = _my_checkpoints()
     return missing_field_fail()
     
 def _search_checkpoints():
@@ -40,15 +41,21 @@ def _search_checkpoints():
 def _checkpoints_near_me():
     """
     return checkpoints given a location, from both friends/anonymous
-    (does not return notifications, etc, those belong to the `update` API)
+    as well as notifications on new comments, etc.
     """
     user_id = request.form.get("user_id")
     user = get_user(user_id)
-    latitude = request.form.get("latitude")
-    longitude = request.form.get("longitude")
+    point_coord = request.form.get("latitude"), request.form.get("longitude") 
+    radius = request.form.get("radius", 2)
+    
+    nearby_checkpoints = get_nearby_checkpoints(user, point_coord, radius)
+    return nearby_checkpoints
     
 def _my_checkpoints():
-    pass
+    """
+    return all user checkpoints that belong to user
+    as well as notifications on new comments, etc.
+    """
 
 def new_checkpoint():
     """

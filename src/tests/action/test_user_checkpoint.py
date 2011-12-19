@@ -2,7 +2,10 @@
 # unit tests for user checkpoint action layer
 #===============================================================================
 from tests.util.test_base import TestBase
-from action.user_checkpoint import get_nearby_checkpoints
+from action.user_checkpoint import get_nearby_checkpoints,\
+    add_checkpoint_to_user
+from tests.action.test_checkpoint import CheckpointTests
+from action.checkpoint import add_checkpoint
 
 class UserCheckpointActionTests(TestBase):
     
@@ -10,12 +13,30 @@ class UserCheckpointActionTests(TestBase):
         """
         unit tests get_nearby_checkpoints
         """
-        user_a_with_friends = self.create_saved_test_user()
-        user_b = self.create_saved_test_user()
-        user_c = self.create_saved_test_user()
-        user_d = self.create_saved_test_user()
-        self.befriend_test_user(user_a_with_friends, (user_b, user_c, user_d))
+        #group a
+        a_user1 = self.create_saved_test_user()
+        a_user2 = self.create_saved_test_user()
+        self.befriend_test_user(a_user1, [a_user2])
         
-        nearby_ucp = get_nearby_checkpoints(user_a_with_friends.user_obj, (0.0,0.0), 99999)
-        for ucp in nearby_ucp:
-            print ucp 
+        #anon users
+        anon_user1 = self.create_saved_test_user()
+        
+        #create checkpoints in group a
+        checkpoint_a_data = CheckpointTests.mock_checkpoint_data(a_user1.user_obj.id, (999.9, 999.9))
+        a1_checkpoint = add_checkpoint(*checkpoint_a_data)
+        a1_ucp = add_checkpoint_to_user(a_user1.user_obj, a1_checkpoint)
+        
+        checkpoint_b_data = CheckpointTests.mock_checkpoint_data(a_user2.user_obj.id, (-999.9, -999.9))
+        a2_checkpoint = add_checkpoint(*checkpoint_b_data)
+        a2_ucp = add_checkpoint_to_user(a_user2.user_obj, a2_checkpoint)
+        
+        checkpoint_c_data = CheckpointTests.mock_checkpoint_data(anon_user1.user_obj.id, (999.9, 999.9))
+        a3_checkpoint = add_checkpoint(*checkpoint_c_data)
+        a3_ucp = add_checkpoint_to_user(anon_user1.user_obj, a3_checkpoint)
+        
+        #verification
+        friends_ucp, anon_ucp = get_nearby_checkpoints(a_user1.user_obj, (999.9, 999.9), 0.1)
+        
+        assert a1_ucp in friends_ucp
+        assert not a2_ucp in friends_ucp
+        assert a3_ucp in anon_ucp
