@@ -40,6 +40,25 @@ class Checkpoint(db.Model):
     longitude = db.Column(DOUBLE)
     latitude = db.Column(DOUBLE)
     
+    @property
+    def serialize(self):
+        """
+        Return this object data into an easily serializable form (For JSON)
+        """
+        return {
+                "id": self.id,
+                "creator": self.creator,
+                "name": self.name,
+                "description": self.description,
+                "price": self.price,
+                "expiry": self.expiry.isoformat(),
+                "date_created": self.date_created.isoformat(),
+                "type": self.type,
+                "image": self.image,
+                "longitude": self.longitude,
+                "latitude": self.latitude
+                }
+    
 class FriendConnection(db.Model):
     """
     Describes a two-way connection between 2 friends on Facebook 
@@ -67,6 +86,16 @@ class UserCheckpoint(db.Model):
     user = db.relationship("User")
     checkpoint_id = db.Column(db.Integer, db.ForeignKey('checkpoint.id'))
     checkpoint = db.relationship("Checkpoint")
+    
+    @property
+    def serialize(self):
+        """
+        Return this object data into an easily serializable form (For JSON)
+        """
+        return {
+                "id": self.id,
+                "checkpoint": self.checkpoint.serialize
+                }
     
 class UserCheckpointOptions(db.Model):
     """
@@ -119,4 +148,18 @@ class Notification(db.Model):
     relevant_id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(255), nullable=True)
     timestamp = db.Column(db.DateTime)
-    fresh = db.Column(db.Boolean)  
+    fresh = db.Column(db.Boolean)
+    
+    @property
+    def serialize(self):
+        """
+        Return this object data into an easily serializable form (For JSON)
+        """
+        return {
+                "id": self.id,
+                "type": self.type,
+                "relevant_id": self.relevant_id,
+                "description": self.description,
+                "timestamp": self.timestamp.isoformat(),
+                "fresh": self.fresh
+                }

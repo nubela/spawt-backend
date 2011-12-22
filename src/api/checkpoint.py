@@ -13,26 +13,45 @@ from action.user import get_user
 from action.checkpoint import add_checkpoint
 from action.location import add_location
 from action.user_checkpoint import add_checkpoint_to_user,\
-    get_nearby_checkpoints, get_my_checkpoints
+    get_nearby_checkpoints, get_my_checkpoints, search_user_checkpoints,\
+    user_checkpoint_sanify
 from action.share import share
 import base64
 from os.path import join
 from action import user_checkpoint
+from action.notification import get_my_notifications_by_date,\
+    notification_sanify
 
 def get_checkpoint():
     """
     (GET: checkpoint)
     """
-    authorize("get", "checkpoint")
-    
-    longitude = request.form.get("type")
+    type = request.args.get("type")
+    user_id = request.args.get("user_id")
+    signature = request.args.get("signature")
+    authorize("get", "checkpoint", user_id, signature)
     
     if type == "search":
-        result = _search_checkpoints()
+        user_checkpoints = _search_checkpoints()
+        return jsonify({"checkpoints": user_checkpoint_sanify(user_checkpoints),
+                        "status": "ok", 
+                        })
+        
     elif type == "near":
-        result = _checkpoints_near_me()
+        friends_ucp, anon_ucp, notifications = _checkpoints_near_me()
+        return jsonify({"friends_checkpoints": user_checkpoint_sanify(friends_ucp),
+                        "anon_checkpoints": user_checkpoint_sanify(anon_ucp),
+                        "notifications": notification_sanify(notifications),
+                        "status": "ok", 
+                        })
+        
     elif type == "mine":
-        result = _my_checkpoints()
+        user_checkpoints, notifications = _my_checkpoints()
+        return jsonify({"checkpoints": user_checkpoint_sanify(user_checkpoints),
+                        "notifications": notification_sanify(notifications),
+                        "status": "ok", 
+                        })
+        
     return missing_field_fail()
     
 def _search_checkpoints():
@@ -41,33 +60,41 @@ def _search_checkpoints():
     Append a wildcard to the left and right of the phrase, and search
     Checkpoint's Description, Name, and User's name (Facebook name) 
     """
-    user_id = request.form.get("user_id")
+    user_id = request.args.get("user_id")
+    search_term = request.args.get("keyword").strip()
     user = get_user(user_id)
-    search_term = request.form.get("keyword").strip()
     
-    pass    
+    search_results = search_user_checkpoints(user, search_term)
+    return search_results    
 
 def _checkpoints_near_me():
     """
     return checkpoints given a location, from both friends/anonymous
     as well as notifications on new comments, etc.
     """
-    user_id = request.form.get("user_id")
-    user = get_user(user_id)
-    point_coord = request.form.get("latitude"), request.form.get("longitude") 
-    radius = request.form.get("radius", 2)
+    user_id = request.args.get("user_id")
+    point_coord = float(request.args.get("latitude")), float(request.args.get("longitude"))
+    radius = float(request.args.get("radius", 2))
+    user = get_user(user_id) 
     
-    nearby_checkpoints = get_nearby_checkpoints(user, point_coord, radius)
-    return nearby_checkpoints
+    friends_ucp, anon_ucp = get_nearby_checkpoints(user, point_coord, radius)
+    notifications = get_my_notifications_by_date(user)
+                                                     
+    return friends_ucp, anon_ucp, notifications
     
 def _my_checkpoints():
     """
     return all user checkpoints that belong to user
     as well as notifications on new comments, etc.
     """
-    user_id = request.form.get("user_id")
+    user_id = request.args.get("user_id")
+    notification_date = request.args.get("last_notification_check_date")
     user = get_user(user_id)
-    return get_my_checkpoints(user)
+    
+    user_checkpoints = get_my_checkpoints(user)
+    notifications = get_my_notifications_by_date(user, notification_date)
+    
+    return user_checkpoints, notifications 
 
 def new_checkpoint():
     """

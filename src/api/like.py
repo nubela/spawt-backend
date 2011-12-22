@@ -28,7 +28,7 @@ def new_like():
     if not is_api_key_validated(auth_code, user_id, signature, verb, noun):
         return authorization_fail()
     
-    like = add_like(user, user_checkpoint.checkpoint)
+    like = add_like(user, user_checkpoint)
     
     return jsonify({
                     "status": "ok",

@@ -2,7 +2,7 @@
 # UserCheckpoint action layer 
 #===============================================================================
 from util.geo import bounding_box, proximity_sort
-from sqlalchemy.sql.expression import and_
+from sqlalchemy.sql.expression import and_, or_, union_all, alias
 from action.user import get_friends
 from collections import namedtuple
 from action.checkpoint import CHECKPOINT_TYPES
@@ -150,6 +150,34 @@ def get_recent_friend_user_checkpoints(user_obj, cut_off_date=_get_2_weeks_date_
     
     return q.all()
 
+def search_user_checkpoints(user_obj, search_term):
+    """
+    Searches both my UserCheckpoints and my friends' with a literal search term.
+    Searches a Checkpoint's name, description, and User's (Facebook) name (union)
+    """
+    from db import UserCheckpoint, db, FacebookUser, User, FriendConnection, Checkpoint
+    search_term_with_wildcard = "%"+search_term+"%"
+    
+    #query that contain my own and my friends' usercheckpoints
+    FriendUserCheckpoint, FriendFacebookUser, FriendUser = aliased(UserCheckpoint), aliased(FacebookUser), aliased(User)
+    ucp = (db.session.query(UserCheckpoint).
+           join(Checkpoint, Checkpoint.id == UserCheckpoint.checkpoint_id).
+           join(FriendUser, FriendUser.id == UserCheckpoint.user_id).
+           join(FriendFacebookUser, FriendFacebookUser.id == FriendUser.facebook_user_id).
+           join(FriendConnection, FriendConnection.fb_user_to == FriendFacebookUser.id).
+           join(FacebookUser, FacebookUser.id == FriendConnection.fb_user_from).
+           join(User, User.facebook_user_id == FacebookUser.id).
+           filter(or_(User.id == user_obj.id, FriendUser.id == user_obj.id))        
+           )
+    
+    name_search = ucp.filter(Checkpoint.name.ilike(search_term_with_wildcard))
+    desc_search = ucp.filter(Checkpoint.description.ilike(search_term_with_wildcard))
+    fb_name_search = ucp.filter(FriendFacebookUser.name.ilike(search_term_with_wildcard))
+    
+    result = name_search.union(desc_search).union(fb_name_search)
+    
+    return result.all()
+
 def user_checkpoint_sanify(ucp_collection):
     """
     sanify a <<UserCheckpoint>> collection for jsonify-ication
@@ -159,9 +187,9 @@ def user_checkpoint_sanify(ucp_collection):
     for ucp in ucp_collection:
         if ucp.checkpoint.type.lower() in CHECKPOINT_TYPES:
             if ucp.checkpoint.type.lower() in separated:
-                separated[ucp.checkpoint.type.lower()] += [ucp]
+                separated[ucp.checkpoint.type.lower()] += [ucp.serialize]
             else: 
-                separated[ucp.checkpoint.type.lower()] = [ucp]
+                separated[ucp.checkpoint.type.lower()] = [ucp.serialize]
     return separated
 
 def _checkpoints_to_location_namedtuples(lis_of_cp):

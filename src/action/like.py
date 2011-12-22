@@ -2,6 +2,9 @@
 # Action layer for Likes
 #===============================================================================
 import datetime
+from action.notification import add_notification
+
+NOTIFICATION_TYPE = "new_like"
 
 def get_like(id):
     """
@@ -23,11 +26,13 @@ def get_like_w_attr(user_obj, checkpoint_obj):
         return likes.first()
     return None
 
-def add_like(user_obj, checkpoint_obj):
+def add_like(user_obj, user_checkpoint_obj):
     """
     Instantiates a new Like record between a user and a Checkpoint,
     returns it if it already exists
     """
+    
+    checkpoint_obj = user_checkpoint_obj.checkpoint
     
     like_obj = get_like_w_attr(user_obj, checkpoint_obj)
     if not get_like_w_attr(user_obj, checkpoint_obj) is None:
@@ -42,6 +47,9 @@ def add_like(user_obj, checkpoint_obj):
     
     db.session.add(like_obj)
     db.session.commit()
+    
+    #add notification
+    add_notification(NOTIFICATION_TYPE, user_obj, user_checkpoint_obj.user, like_obj.id)
     
     return like_obj
     

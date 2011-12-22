@@ -1,7 +1,7 @@
 import datetime
 from action.common import _get_2_weeks_date_before
 
-NOTIFICATION_TYPES = ("new_like", "mew_comment", "new_share")
+NOTIFICATION_TYPES = ("new_like", "new_comment", "new_share")
 
 def add_notification(type, from_user, to_user, obj_id, description=None):
     from db import Notification, db
@@ -37,7 +37,7 @@ def notification_sanify(notification_collection):
     for n in notification_collection:
         if n.type in NOTIFICATION_TYPES:
             if n.type in separated:
-                separated[n.type] += [separated]
+                separated[n.type] += [n.serialize]
             else:
-                separated[n.type] = [separated]
+                separated[n.type] = [n.serialize]
     return separated

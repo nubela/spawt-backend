@@ -4,7 +4,7 @@
 from tests.util.test_base import TestBase
 from action.user_checkpoint import get_nearby_checkpoints,\
     add_checkpoint_to_user, get_my_checkpoints,\
-    get_recent_friend_user_checkpoints
+    get_recent_friend_user_checkpoints, search_user_checkpoints
 from tests.action.test_checkpoint import CheckpointTests
 from action.checkpoint import add_checkpoint
 
@@ -60,3 +60,27 @@ class UserCheckpointActionTests(TestBase):
         recent_ucp = get_recent_friend_user_checkpoints(user_a.user_obj)
         
         assert len(recent_ucp) == 1
+        
+    def test_search_user_checkpoints(self):
+        """
+        unit test for search_user_checkpoints()
+        """
+        user_a = self.create_saved_test_user_with_checkpoint()
+        user_b = self.create_saved_test_user_with_checkpoint()
+        user_c = self.create_saved_test_user_with_checkpoint()
+        self.befriend_test_user(user_a, [user_b])
+        
+        #search user_a facebook name
+        user_a_fb_name = user_a.user_obj.facebook_user.name
+        res = search_user_checkpoints(user_a.user_obj, user_a_fb_name)
+        assert len(res) == 1 and res[0] == user_a.user_checkpoint_obj
+        
+        #search by desc
+        desc = user_b.checkpoint_obj.description
+        res = search_user_checkpoints(user_a.user_obj, desc)
+        assert len(res) == 1 and res[0] == user_b.user_checkpoint_obj
+        
+        #search by name
+        name = user_b.checkpoint_obj.name
+        res = search_user_checkpoints(user_a.user_obj, name)
+        assert len(res) == 1 and res[0] == user_b.user_checkpoint_obj

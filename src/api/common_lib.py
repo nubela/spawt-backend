@@ -30,10 +30,8 @@ def authorization_required(verb, noun):
     
     return dec
 
-def authorize(verb, noun):
+def authorize(verb, noun, user_id, signature):
     #auth vars
-    user_id = request.form.get("user_id")
-    signature = request.form.get("signature")
     user = get_user(user_id)
     auth_code = user.auth_code
     

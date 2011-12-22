@@ -36,7 +36,7 @@ def new_comment():
                         "error": "Comment too long",
                         })
         
-    comment = add_comment(user, user_checkpoint.checkpoint, comment)
+    comment = add_comment(user, user_checkpoint, comment)
     
     return jsonify({
                     "status": "ok",

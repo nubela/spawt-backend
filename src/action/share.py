@@ -4,8 +4,10 @@
 from facebook.facebook import post_on_wall, get_app_access_token
 import datetime
 from local_config import APP_ID, APP_SECRET
+from action.notification import add_notification
 
 FACEBOOK_SHARE_CAPTION = "Another experience captured by ctrlEFF"
+NOTIFICATION_TYPE = "new_share"
 
 def get_share(id):
     """
@@ -46,6 +48,10 @@ def add_share(user_from, user_to, user_checkpoint):
     
     db.session.add(share)
     db.session.commit()
+    
+    #add notification
+    add_notification(NOTIFICATION_TYPE, user_from, user_to, share.id)
+    
     return share
     
 def share(user_from, user_to, user_checkpoint):
