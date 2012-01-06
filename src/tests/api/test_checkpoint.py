@@ -10,10 +10,11 @@ import urllib
 from tests.action.test_checkpoint import CheckpointTests
 from action.checkpoint import add_checkpoint
 from action.user_checkpoint import add_checkpoint_to_user
+import simplejson
 
 class CheckpointAPITests(TestBase):
     
-    def a_test_new_checkpoint(self):
+    def test_new_checkpoint(self):
         """
         test the new_checkpoint API
         """
@@ -44,7 +45,7 @@ class CheckpointAPITests(TestBase):
         response = self.client.put("/checkpoint/", data=data)
         assert "user_checkpoint_id" in response.data
         
-    def a_test_new_invalid_checkpoint(self):
+    def test_new_invalid_checkpoint(self):
         """
         test the new_checkpoint API, with an invalid checkpoint (without expiry/price)
         """
@@ -74,7 +75,7 @@ class CheckpointAPITests(TestBase):
         response = self.client.put("/checkpoint/", data=data)
         assert "Requires at least a price or expiry." in response.data
         
-    def atest_get_checkpoint_search(self):
+    def test_get_checkpoint_search(self):
         """
         test the search functionality of (get:checkpoint) api 
         """
@@ -132,3 +133,22 @@ class CheckpointAPITests(TestBase):
         assert a1_ucp.checkpoint.name in response.data
         assert not a2_ucp.checkpoint.name in response.data
         assert a3_ucp.checkpoint.name in response.data
+        
+    def test_get_checkpoint_mine(self):
+        """
+        test the my-checkpoints functionality of (get:checkpoint) api
+        """
+        #create users
+        user_a = self.create_saved_test_user_with_checkpoint()
+        user_b = self.create_saved_test_user_with_checkpoint()
+        self.befriend_test_user(user_a, [user_b])
+        
+        data = {"user_id":user_a.user_obj.id,
+                "signature": gen_signature(user_a.authcode, "get", "checkpoint", gen_api_key(user_a.authcode, user_a.user_obj.id)),
+                "type": "mine",
+                }
+        
+        response = self.client.get("/checkpoint/?" + urllib.urlencode(data))
+        assert "ok" in response.data
+        assert user_a.checkpoint_obj.name in response.data
+        assert not user_b.checkpoint_obj.name in response.data 

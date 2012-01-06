@@ -8,8 +8,31 @@ import os
 from action.user import save_user, get_user_from_email, get_friends
 from action.friend_connection import get_friend_connection
 from tests.util.test_base import TestBase
+from simplejson import loads
 
 class UserTests(TestBase):
+    
+    def test_login(self):
+        app_xs_token = get_app_access_token(APP_ID, APP_SECRET)
+        test_user = create_test_user(APP_ID, app_xs_token)
+        friend_1 = create_test_user(APP_ID, app_xs_token)
+        friend_2 = create_test_user(APP_ID, app_xs_token)
+        friend_3 = create_test_user(APP_ID, app_xs_token)
+        make_friend_connection(test_user["id"], friend_1["id"], test_user["access_token"], friend_1["access_token"])
+        make_friend_connection(test_user["id"], friend_2["id"], test_user["access_token"], friend_2["access_token"])
+        make_friend_connection(test_user["id"], friend_3["id"], test_user["access_token"], friend_3["access_token"])
+        
+        #create friend_2 first
+        friend2_fb_user_info, friend2_user = save_user(friend_2["access_token"], "someauthcode")
+        
+        data = {"access_token": test_user["access_token"]}
+        
+        #login test_user
+        response = self.client.put("/user/?", data=data)
+        assert "ok" in response.data
+        json_resp = loads(response.data)
+        assert json_resp["status"] == "ok"
+        assert json_resp["result"]["friends"][0]["user_id"] == friend2_user.id 
     
     def test_save_user(self):
         #create test user with 3 friends

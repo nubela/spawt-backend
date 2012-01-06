@@ -29,7 +29,9 @@ def get_checkpoint():
     type = request.args.get("type")
     user_id = request.args.get("user_id")
     signature = request.args.get("signature")
-    authorize("get", "checkpoint", user_id, signature)
+    
+    if not authorize("get", "checkpoint", user_id, signature):
+        return authorization_fail()
     
     if type == "search":
         user_checkpoints = _search_checkpoints()

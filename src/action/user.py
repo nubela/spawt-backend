@@ -71,10 +71,14 @@ def addupdate_user(fb_user, email, access_token, auth_code):
     
     return user
 
-def get_friends(user_obj):
+def get_friends(user_obj, exclude_self=None):
     """
-    returns a list of <<User>> objects
+    returns a list of <<User>> objects, if exclude_self is True, it will not consider the current
+    user as a friend.
     """
+    if exclude_self == None:
+        exclude_self = False
+    
     from db import db, User, FriendConnection, FacebookUser
     
     FriendFacebookUser, FriendUser = aliased(FacebookUser), aliased(User)
@@ -87,6 +91,7 @@ def get_friends(user_obj):
     friends_q = friends_q.filter(User.id == user_obj.id)
     
     friends = [f[1] for f in friends_q.all()]
-    friends += [user_obj]
+    if not exclude_self:
+        friends += [user_obj]
     
     return friends

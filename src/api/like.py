@@ -1,7 +1,7 @@
 from flask.globals import request
 from action.user_checkpoint import get_user_checkpoint
 from action.user import get_user
-from api.common_lib import authorization_fail
+from api.common_lib import authorization_fail, authorize
 from action.authorization import is_api_key_validated
 from action.like import add_like
 from flask.helpers import jsonify

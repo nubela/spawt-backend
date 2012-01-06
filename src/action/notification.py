@@ -20,10 +20,13 @@ def add_notification(type, from_user, to_user, obj_id, description=None):
     
     return new_notification
 
-def get_my_notifications_by_date(user_obj, cut_off_date = _get_2_weeks_date_before()):
+def get_my_notifications_by_date(user_obj, cut_off_date = None):
     """
     return most recent <<Notification>> of various types before a certain cut off date 
     """
+    if cut_off_date is None:
+        cut_off_date = _get_2_weeks_date_before()
+    
     from db import db, Notification
     notifications = Notification.query.filter(Notification.timestamp > cut_off_date)
     return notifications.all()

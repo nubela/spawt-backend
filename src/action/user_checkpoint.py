@@ -129,10 +129,13 @@ def get_my_checkpoints(user_obj):
     ucp = UserCheckpoint.query.filter_by(user_id=user_obj.id)
     return ucp.all() 
 
-def get_recent_friend_user_checkpoints(user_obj, cut_off_date=_get_2_weeks_date_before()):
+def get_recent_friend_user_checkpoints(user_obj, cut_off_date=None):
     """
     (faux notification) returns Checkpoints that were recently created by friends
     """
+    if cut_off_date is None:
+        cut_off_date = _get_2_weeks_date_before()
+    
     from db import UserCheckpoint, db, FacebookUser, User, FriendConnection, Checkpoint
     
     FriendUserCheckpoint, FriendFacebookUser, FriendUser = aliased(UserCheckpoint), aliased(FacebookUser), aliased(User)
