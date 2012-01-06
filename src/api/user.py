@@ -35,7 +35,7 @@ def user_login():
                                  "id": user.id,
                                  },
                         "friends": friends_lis,
-                        "facebook_user_id": fb_user_info.id,
+                        "facebook_user_id": fb_user_info["id"],
                         "api_key": api_key,
                     }
                     })
