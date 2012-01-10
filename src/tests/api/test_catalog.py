@@ -18,10 +18,9 @@ class CatalogAPITests(TestBase):
         user_for_catalog_add = self.create_saved_test_user()
         
         data = {"user_id": user_for_catalog_add.user_obj.id,
-                "signature": gen_signature(user_for_catalog_add.authcode, 
-                                           "post", 
+                "signature": gen_signature("post", 
                                            "catalog", 
-                                           gen_api_key(user_for_catalog_add.authcode, 
+                                           gen_api_key(user_for_catalog_add.user_obj.access_token, 
                                                        user_for_catalog_add.user_obj.id)),
                 "user_checkpoint_id": user_with_checkpoint.user_checkpoint_obj.id, 
                 }

@@ -22,10 +22,10 @@ def new_like():
     noun = "like"
     user = get_user(user_id)
     user_checkpoint = get_user_checkpoint(user_checkpoint_id)
-    auth_code = user.auth_code
+    access_token = user.access_token
     
     #authorization check
-    if not is_api_key_validated(auth_code, user_id, signature, verb, noun):
+    if not is_api_key_validated(access_token, user_id, signature, verb, noun):
         return authorization_fail()
     
     like = add_like(user, user_checkpoint)

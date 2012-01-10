@@ -14,8 +14,9 @@ class ShareAPITest(TestBase):
         
         data = {"user_id": test_user_with_checkpoint.user_obj.id,
                 "to_user_id": another_test_user_to_share.user_obj.id,
-                "signature": gen_signature(test_user_with_checkpoint.authcode, "put", "share", 
-                                           gen_api_key(test_user_with_checkpoint.authcode, 
+                "signature": gen_signature("put",
+                                           "share",
+                                           gen_api_key(test_user_with_checkpoint.user_obj.access_token, 
                                                        test_user_with_checkpoint.user_obj.id)),
                 "user_checkpoint_id": test_user_with_checkpoint.user_checkpoint_obj.id
                 }

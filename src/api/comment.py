@@ -2,7 +2,7 @@ from flask.globals import request
 from action.user import get_user
 from action.user_checkpoint import get_user_checkpoint
 from action.authorization import is_api_key_validated
-from api.common_lib import authorization_fail
+from api.common_lib import authorization_fail, authorize
 from flask.helpers import jsonify
 from action.comment import add_comment
 
@@ -23,10 +23,9 @@ def new_comment():
     noun = "comment"
     user = get_user(user_id)
     user_checkpoint = get_user_checkpoint(user_checkpoint_id)
-    auth_code = user.auth_code
     
     #authorization check
-    if not is_api_key_validated(auth_code, user_id, signature, verb, noun):
+    if not authorize(verb, noun, user_id, signature):
         return authorization_fail()
     
     #comment validation

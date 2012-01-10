@@ -12,7 +12,7 @@ from util import random_string
 
 app = get_app()
 
-def save_file(post_file, extension=None, subdir=None, dir_to_save=None):
+def save_file(post_file, extension=None, subdir=None, dir_to_save=None, encoded=None):
     """
     Saves a file to a directory.
     * file must be base64 encoded stream.
@@ -27,13 +27,18 @@ def save_file(post_file, extension=None, subdir=None, dir_to_save=None):
         dir_to_save = app.config["upload_dir"]
     if subdir == None: 
         subdir = ""
+    if encoded == None:
+        encoded=True
         
     #ensure directory is created
     working_dir = os.path.join(dir_to_save, subdir)
     if not os.path.exists(working_dir):
         os.makedirs(working_dir)
     
-    file_data = base64.b64decode(post_file)
+    file_data = None
+    if encoded:
+        file_data = base64.b64decode(post_file)
+    else: file_data = post_file.read()
     
     file_name = random_string() + extension
     absolute_write_path = os.path.join(working_dir, file_name) 

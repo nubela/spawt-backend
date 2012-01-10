@@ -12,8 +12,8 @@ class AuthorizationTests(TestBase):
         user_id = user.user_obj.id
         api_key = gen_api_key(auth_code, user_id)
         
-        client_side_signature_a = gen_signature(auth_code, "get", "noun", api_key)
-        client_side_signature_b = gen_signature(auth_code, "not_get", "noun", api_key)
+        client_side_signature_a = gen_signature("get", "noun", api_key)
+        client_side_signature_b = gen_signature("not_get", "noun", api_key)
         
         assert is_api_key_validated(auth_code, user_id, client_side_signature_a, "get", "noun")
         assert not is_api_key_validated(auth_code, user_id, client_side_signature_b, "get", "noun")

@@ -21,6 +21,7 @@ from os.path import join
 from action import user_checkpoint
 from action.notification import get_my_notifications_by_date,\
     notification_sanify
+from rest_client.rest import unserialize_json_datetime
 
 def get_checkpoint():
     """
@@ -114,18 +115,24 @@ def new_checkpoint():
     description = request.form.get("description", None)
     price = request.form.get("price", None)
     expiry = request.form.get("expiry", None)
-    image_encoded = request.form.get("image")
+    image_encoded = request.form.get("image", None)
     type = request.form.get("type")
     share = request.form.get("share", None)
+    facebook_post = request.form.get("facebook_post", False)
+    image = None
+    if image_encoded is None:
+        image = request.files["image"]
     
     #generated vars
     verb = "put"
     noun = "checkpoint"
     user = get_user(user_id)
-    auth_code = user.auth_code
+    expiry_datetime = None
+    if expiry:
+        expiry_datetime = unserialize_json_datetime(expiry)
     
-    #authorization check
-    if not is_api_key_validated(auth_code, user_id, signature, verb, noun):
+    if not authorize(verb, noun, user_id, signature):
+        print "fail"
         return authorization_fail()
     
     #checkpoint validation check
@@ -138,9 +145,13 @@ def new_checkpoint():
     #save image
     from util.fileupload import save_file
     upload_dir = join(get_resources_abs_path(), "uploads")
-    img_file_name = save_file(image_encoded, ".jpg", str(user.id), upload_dir)
     
-    checkpoint = add_checkpoint(user_id, name, type, img_file_name, longitude, latitude, description, price, expiry)
+    if image_encoded is None:
+        img_file_name = save_file(image, ".jpg", str(user.id), upload_dir, encoded=False)
+    else: 
+        img_file_name = save_file(image_encoded, ".jpg", str(user.id), upload_dir)
+    
+    checkpoint = add_checkpoint(user_id, name, type, img_file_name, longitude, latitude, description, price, expiry_datetime)
     user_checkpoint  = add_checkpoint_to_user(user, checkpoint)
     
     #dispatch shares

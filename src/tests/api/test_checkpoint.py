@@ -31,7 +31,7 @@ class CheckpointAPITests(TestBase):
         
         #craft request params
         data = {"user_id":user.id,
-                "signature": gen_signature(authcode, "put", "checkpoint", gen_api_key(authcode, user.id)),
+                "signature": gen_signature("put", "checkpoint", gen_api_key(user.access_token, user.id)),
                 "name": random_string(),
                 "longitude": 2.0,
                 "latitude": 1.0,
@@ -62,7 +62,7 @@ class CheckpointAPITests(TestBase):
         
         #craft request params
         data = {"user_id":user.id,
-                "signature": gen_signature(authcode, "put", "checkpoint", gen_api_key(authcode, user.id)),
+                "signature": gen_signature("put", "checkpoint", gen_api_key(user.access_token, user.id)),
                 "name": random_string(),
                 "longitude": 2.0,
                 "latitude": 1.0,
@@ -85,7 +85,7 @@ class CheckpointAPITests(TestBase):
         
         #build data for request
         data = {"user_id":user_a.user_obj.id,
-                "signature": gen_signature(user_a.authcode, "get", "checkpoint", gen_api_key(user_a.authcode, user_a.user_obj.id)),
+                "signature": gen_signature("get", "checkpoint", gen_api_key(user_a.user_obj.access_token, user_a.user_obj.id)),
                 "type": "search",
                 "keyword": user_b.checkpoint_obj.name, 
                 }
@@ -121,7 +121,7 @@ class CheckpointAPITests(TestBase):
         
         #build data
         data = {"user_id":a_user1.user_obj.id,
-                "signature": gen_signature(a_user1.authcode, "get", "checkpoint", gen_api_key(a_user1.authcode, a_user1.user_obj.id)),
+                "signature": gen_signature("get", "checkpoint", gen_api_key(a_user1.user_obj.access_token, a_user1.user_obj.id)),
                 "type": "near",
                 "latitude": 999.9,
                 "longitude": 999.9,
@@ -136,7 +136,8 @@ class CheckpointAPITests(TestBase):
         
     def test_get_checkpoint_mine(self):
         """
-        test the my-checkpoints functionality of (get:checkpoint) api
+        test the my-checkpoints functionalit
+                getNewCheckpointBean().getUserBean().getUserId()).toString()));y of (get:checkpoint) api
         """
         #create users
         user_a = self.create_saved_test_user_with_checkpoint()
@@ -144,7 +145,7 @@ class CheckpointAPITests(TestBase):
         self.befriend_test_user(user_a, [user_b])
         
         data = {"user_id":user_a.user_obj.id,
-                "signature": gen_signature(user_a.authcode, "get", "checkpoint", gen_api_key(user_a.authcode, user_a.user_obj.id)),
+                "signature": gen_signature("get", "checkpoint", gen_api_key(user_a.user_obj.access_token, user_a.user_obj.id)),
                 "type": "mine",
                 }
         

@@ -2,7 +2,7 @@ from flask.globals import request
 from action.user import get_user
 from action.user_checkpoint import get_user_checkpoint
 from action.authorization import is_api_key_validated
-from api.common_lib import authorization_fail
+from api.common_lib import authorization_fail, authorize
 from flask.helpers import jsonify
 from action.share import share
 
@@ -24,10 +24,9 @@ def new_share():
     user_from = get_user(from_user_id)
     user_to = get_user(to_user_id)
     user_checkpoint = get_user_checkpoint(user_checkpoint_id)
-    auth_code = user_from.auth_code
     
     #authorization check
-    if not is_api_key_validated(auth_code, from_user_id, signature, verb, noun):
+    if not authorize(verb, noun, user_from.id, signature):
         return authorization_fail()
     
     share(user_from, user_to, user_checkpoint)

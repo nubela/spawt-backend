@@ -14,10 +14,9 @@ class LikeAPITest(TestBase):
         
         #prep api call
         data = {"user_id": annoying_user_that_likes_everything.user_obj.id,
-                "signature": gen_signature(annoying_user_that_likes_everything.authcode, 
-                                           "put", 
+                "signature": gen_signature("put", 
                                            "like",
-                                           gen_api_key(annoying_user_that_likes_everything.authcode, 
+                                           gen_api_key(annoying_user_that_likes_everything.user_obj.access_token, 
                                                        annoying_user_that_likes_everything.user_obj.id)),
                 "user_checkpoint_id": test_user_with_checkpoint.user_checkpoint_obj.id, 
                 } 

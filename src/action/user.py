@@ -61,13 +61,14 @@ def addupdate_user(fb_user, email, access_token, auth_code):
     
     if not user:
         user = User()
-        user.facebook_user_id = fb_user
-        user.email = email
-        user.auth_code = auth_code
-        user.access_token = access_token
         
-        db.session.add(user)
-        db.session.commit()
+    user.facebook_user_id = fb_user
+    user.email = email
+    user.auth_code = auth_code
+    user.access_token = access_token
+        
+    db.session.add(user)
+    db.session.commit()
     
     return user
 

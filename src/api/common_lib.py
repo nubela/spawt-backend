@@ -33,8 +33,8 @@ def authorization_required(verb, noun):
 def authorize(verb, noun, user_id, signature):
     #auth vars
     user = get_user(user_id)
-    auth_code = user.auth_code
+    access_token = user.access_token
     
-    if not is_api_key_validated(auth_code, user_id, signature, verb, noun):
+    if not is_api_key_validated(access_token, user_id, signature, verb, noun):
         return False
     return True

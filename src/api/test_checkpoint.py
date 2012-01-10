@@ -35,7 +35,7 @@ class CheckpointTests(unittest.TestCase):
         auth_code = "someauthcode"
         fb_user_info, user = save_user(test_user["access_token"], auth_code)
         user_id = user.id
-        api_key = gen_api_key(auth_code, user_id)
+        api_key = gen_api_key(test_user["access_token"], user_id)
         
         #create signature
         signature = "\n".join([auth_code, "put", "checkpoint"])

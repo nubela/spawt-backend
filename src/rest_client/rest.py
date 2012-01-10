@@ -5,8 +5,17 @@ from urllib import urlencode
 import httplib
 from simplejson import loads
 from urlparse import parse_qsl
+from datetime import datetime
 
-REQ_CACHE = {}
+REQ_CACHE = {} 
+
+DATEFORMAT = "%Y/%m/%d %H:%M:%S"
+
+def unserialize_json_datetime(json_str):
+    return datetime.strptime(json_str, DATEFORMAT)
+    
+def serialize_json_datetime(datetime_obj):
+    return datetime.strftime(DATEFORMAT, datetime_obj)
 
 class Request():
     """
