@@ -9,12 +9,17 @@ from action.notification import add_notification
 FACEBOOK_SHARE_CAPTION = "Another experience captured by ctrlEFF"
 NOTIFICATION_TYPE = "new_share"
 
+def get_total_shares(user_checkpoint_obj):
+    from db import Share
+    shares = Share.query.filter_by(user_checkpoint_id=user_checkpoint_obj.id)
+    return shares.count()
+
 def get_share(id):
     """
     gets a share record with the supplied id if it already exists, else, None
     """
     from db import Share
-    cp = share.query.filter_by(id=id)
+    cp = Share.query.filter_by(id=id)
     if cp.count() > 0:
         return cp.first()
     return None
@@ -67,5 +72,5 @@ def share(user_from, user_to, user_checkpoint):
     picture = None
     caption = FACEBOOK_SHARE_CAPTION
     
-    post_on_wall(get_app_access_token(APP_ID, APP_SECRET), user_from.facebook_user.id, message, picture, link, name, caption)
+    #post_on_wall(get_app_access_token(APP_ID, APP_SECRET), user_from.facebook_user.id, message, picture, link, name, caption)
     add_share(user_from, user_to, user_checkpoint)

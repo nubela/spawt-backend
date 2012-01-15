@@ -6,6 +6,11 @@ from action.notification import add_notification
 
 NOTIFICATION_TYPE = "new_like"
 
+def get_checkpoint_comments(checkpoint_obj):
+    from db import Comment
+    all_comments = Comment.query.filter_by(checkpoint_id = checkpoint_obj.id)
+    return all_comments
+
 def get_comment(id):
     """
     Gets the <<Comment>> object with the supplied id
@@ -53,3 +58,6 @@ def del_comment(id):
     
     db.session.delete(comment)
     db.commit()
+
+def comment_sanify(collection):
+    return [c.serialize for c in collection]

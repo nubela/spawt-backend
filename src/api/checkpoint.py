@@ -14,14 +14,17 @@ from action.checkpoint import add_checkpoint
 from action.location import add_location
 from action.user_checkpoint import add_checkpoint_to_user,\
     get_nearby_checkpoints, get_my_checkpoints, search_user_checkpoints,\
-    user_checkpoint_sanify
-from action.share import share
+    user_checkpoint_sanify, sort_checkpoints, get_user_checkpoint
+from action.share import add_share as share_checkpoint, get_total_shares
 import base64
 from os.path import join
 from action import user_checkpoint
 from action.notification import get_my_notifications_by_date,\
     notification_sanify
 from rest_client.rest import unserialize_json_datetime
+from action.comment import comment_sanify, get_checkpoint_comments
+from collections import namedtuple
+from action.like import get_total_likes, get_like_w_attr
 
 def get_checkpoint():
     """
@@ -49,14 +52,60 @@ def get_checkpoint():
                         })
         
     elif type == "mine":
-        user_checkpoints, notifications = _my_checkpoints()
+        user_checkpoints = _my_checkpoints()
         return jsonify({"checkpoints": user_checkpoint_sanify(user_checkpoints),
-                        "notifications": notification_sanify(notifications),
                         "status": "ok", 
                         })
         
-    return missing_field_fail()
+    else:
+        #single checkpoint info
+        res = _checkpoint_details()
+        return jsonify({
+                        "total_likes": res.total_likes,
+                        "total_shares": res.total_shares,
+                        "current_user_like": res.current_user_like,
+                        "comments": comment_sanify(res.comments),
+                        "creator": res.creator,
+                        "checkpoint": res.user_checkpoint_obj.serialize,
+                        "status": "ok",
+                        })
+
+def _checkpoint_details():
+    """
+    Gets detailed information about a (User)Checkpoint given its id.   
+    """
+    CheckpointDetail = namedtuple("CheckpointDetail", 
+                                  ("user_checkpoint_obj", 
+                                   "total_likes",
+                                   "total_shares",
+                                   "current_user_like",
+                                   "comments",
+                                   "creator",                                   
+                                   ))
     
+    user_id = request.args.get("user_id")
+    user_checkpoint_id = request.args.get("user_checkpoint_id")
+    user_obj = get_user(user_id)
+    
+    user_checkpoint_obj = get_user_checkpoint(user_checkpoint_id)
+    total_likes = get_total_likes(user_checkpoint_obj)
+    total_shares = get_total_shares(user_checkpoint_obj)
+    current_user_like = (not get_like_w_attr(user_obj, user_checkpoint_obj.checkpoint) is None)
+    comments = get_checkpoint_comments(user_checkpoint_obj.checkpoint)
+    creator_user_obj = get_user(user_checkpoint_obj.checkpoint.creator)
+    creator = {"full_name": creator_user_obj.facebook_user.name,
+               "facebook_portrait_url": "https://graph.facebook.com/%s/picture" % creator_user_obj.facebook_user.id,
+               }
+    
+    res = CheckpointDetail(user_checkpoint_obj,
+                           total_likes,
+                           total_shares,
+                           current_user_like,
+                           comments,
+                           creator
+                           )
+    return res
+
 def _search_checkpoints():
     """
     A simple implementation of keyword search for Checkpoint.
@@ -91,13 +140,16 @@ def _my_checkpoints():
     as well as notifications on new comments, etc.
     """
     user_id = request.args.get("user_id")
-    notification_date = request.args.get("last_notification_check_date")
     user = get_user(user_id)
+    sort_method = request.args.get("sort_by", "newest") #can be newest, nearest, popular
     
     user_checkpoints = get_my_checkpoints(user)
-    notifications = get_my_notifications_by_date(user, notification_date)
+    sort_checkpoints(user_checkpoints, sort_method, 
+                     longitude=float(request.args.get("longitude", 0.0)),
+                     latitude=float(request.args.get("latitude", 0.0))
+                     )
     
-    return user_checkpoints, notifications 
+    return user_checkpoints 
 
 def new_checkpoint():
     """
@@ -158,7 +210,8 @@ def new_checkpoint():
     if not share is None:
         user_ids_to_share = simplejson.loads(share)
         for uid in user_ids_to_share:
-            share(user.id, uid, user_checkpoint)
+            user_to = get_user(uid)
+            share_checkpoint(user, user_to, user_checkpoint)
     
     #return success
     return jsonify({

@@ -8,6 +8,7 @@ from util.util import random_string
 import datetime
 from action.checkpoint import add_checkpoint, get_checkpoint
 from tests.util.test_base import TestBase
+from action.user_checkpoint import add_checkpoint_to_user
 
 class CheckpointTests(TestBase):
 
@@ -19,7 +20,7 @@ class CheckpointTests(TestBase):
         expiry = datetime.datetime.now()
         type = "play"
         image = "bla_image"
-        return (creator_user_id, name, type, image, point_coord[1], point_coord[0], desc, price, expiry)
+        return (creator_user_id, name, type, image, point_coord[1], point_coord[0], desc, price, expiry)    
     
     def test_add_checkpoint(self):
         """

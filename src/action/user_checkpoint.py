@@ -8,6 +8,7 @@ from collections import namedtuple
 from action.checkpoint import CHECKPOINT_TYPES
 from action.common import _get_2_weeks_date_before
 from sqlalchemy.orm.util import aliased
+from action.like import get_total_likes
 
 def get_user_checkpoint(id):
     """
@@ -121,6 +122,30 @@ def get_nearby_checkpoints(user_obj, point_coord, radius_in_kilometres):
             
     return friends, anon
 
+def sort_checkpoints(ucp_lis, sort_method, **kwargs):
+    """
+    sorts checkpoints according to method supplied.
+    methods available are: newest, nearest, popular
+    
+    if "nearest" method is chosen, longitude/latitude kw args should be provided.
+    """
+    sorted_ucp = None
+    
+    if sort_method == "popular":
+        sorted_ucp = sorted(ucp_lis, 
+                            key=lambda ucp: get_total_likes(ucp), 
+                            reverse=True)
+        
+    elif sort_method == "nearest":
+        lat, lon = kwargs["latitude"], kwargs["longitude"] 
+        ucp_namedtuples = _checkpoints_to_location_namedtuples(ucp_lis)
+        sorted_ucp = proximity_sort((lat, lon), ucp_namedtuples, len(ucp_namedtuples))
+        sorted_ucp = [ucp[1] for ucp in sorted_ucp]
+    else: #newest
+        sorted_ucp = sorted(ucp_lis, key=lambda ucp: ucp.checkpoint.date_created, reverse=True)
+    
+    return sorted_ucp
+
 def get_my_checkpoints(user_obj):
     """
     get all UserCheckpoints belonging to a user
@@ -196,6 +221,9 @@ def user_checkpoint_sanify(ucp_collection):
     return separated
 
 def _checkpoints_to_location_namedtuples(lis_of_cp):
+    """
+    converts a collection of user checkpoint objects to location namedtuples (usually) for proximity sorting
+    """
     Obj = namedtuple("Obj", ("location", "user_checkpoint"))
     lis = []
     for cp in lis_of_cp:

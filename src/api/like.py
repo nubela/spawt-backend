@@ -9,7 +9,7 @@ from flask.helpers import jsonify
 def new_like():
     """
     (PUT: like)
-    Instantiates a new <<Like>> from a user on a <<UserCheckpoint>>
+    Instantiates a new <<CheckpointLike>> from a user on a <<UserCheckpoint>>
     """
     
     #req var

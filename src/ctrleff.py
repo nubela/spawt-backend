@@ -26,6 +26,15 @@ def get_app(static=None):
     app =  Flask(__name__)
     init_app(app)
     static = app
+    
+    #debug mode static file serving
+    if app.config['DEBUG']:
+        from werkzeug.wsgi import SharedDataMiddleware
+        import os
+        app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
+          '/': os.path.join(os.path.dirname(__file__), 'static')
+        })
+    
     return app
 
 def init_db():

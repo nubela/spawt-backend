@@ -9,9 +9,38 @@ import os
 import base64
 from ctrleff import get_app
 from util import random_string
+import Image
+import ExifTags
 
+MOBILE_OPTIMIZED_WIDTH = 800
+MOBILE_OPTIMIZED_FILENAME_APPEND = "_optimized"
 app = get_app()
-
+    
+def resize_img(img_path, basewidth=MOBILE_OPTIMIZED_WIDTH):
+    img = Image.open(img_path)
+    
+    #rotate of exif info exists
+    if not img._getexif() is None:
+        for orientation in ExifTags.TAGS.keys() : 
+            if ExifTags.TAGS[orientation]=='Orientation' : break
+        exif=dict(img._getexif().items())
+        
+        if exif[orientation] == 3: 
+            img = img.rotate(180, expand=True)
+        elif exif[orientation] == 6 : 
+            img = img.rotate(270, expand=True)
+        elif exif[orientation] == 8 : 
+            img = img.rotate(90, expand=True)
+    
+    wpercent = (basewidth/float(img.size[0]))
+    hsize = int((float(img.size[1])*float(wpercent)))
+    img = img.resize((basewidth,hsize), Image.ANTIALIAS)
+    
+    filename = os.path.basename(os.path.splitext(img_path)[0])
+    parent = os.path.dirname(img_path)
+    img.save(os.path.join(parent, filename+MOBILE_OPTIMIZED_FILENAME_APPEND+".jpg"), "JPEG")
+    return os.path.join(parent, filename+MOBILE_OPTIMIZED_FILENAME_APPEND+".jpg")
+    
 def save_file(post_file, extension=None, subdir=None, dir_to_save=None, encoded=None):
     """
     Saves a file to a directory.
@@ -49,6 +78,8 @@ def save_file(post_file, extension=None, subdir=None, dir_to_save=None, encoded=
     file = open(absolute_write_path,'wb+')
     file.write(file_data)
     file.close()
+    
+    resize_img(absolute_write_path)
     
     return file_name
 

@@ -4,11 +4,59 @@
 from tests.util.test_base import TestBase
 from action.user_checkpoint import get_nearby_checkpoints,\
     add_checkpoint_to_user, get_my_checkpoints,\
-    get_recent_friend_user_checkpoints, search_user_checkpoints
+    get_recent_friend_user_checkpoints, search_user_checkpoints,\
+    sort_checkpoints
 from tests.action.test_checkpoint import CheckpointTests
 from action.checkpoint import add_checkpoint
+from action.like import add_like
+import time
 
 class UserCheckpointActionTests(TestBase):
+
+    def test_sort_checkpoints(self):
+        """
+        tests sort_checkpoints() method
+        """
+        user = self.create_saved_test_user()
+        liker = self.create_saved_test_user()
+        
+        #create various checkpoints (mocked data) for sorting
+        cp_a_data = CheckpointTests.mock_checkpoint_data(user.user_obj.id, (0.0,0.0))
+        cp_b_data = CheckpointTests.mock_checkpoint_data(user.user_obj.id, (1.0,1.0))
+        cp_c_data = CheckpointTests.mock_checkpoint_data(user.user_obj.id, (2.0,2.0))
+        
+        #create them
+        cp_a = add_checkpoint(*cp_a_data)
+        time.sleep(1) #have to sleep since datetime doesnt seem to register millisecond differences
+        cp_b = add_checkpoint(*cp_b_data)
+        time.sleep(1)
+        cp_c = add_checkpoint(*cp_c_data)
+        ucp_a = add_checkpoint_to_user(user.user_obj, cp_a)
+        ucp_b = add_checkpoint_to_user(user.user_obj, cp_b)
+        ucp_c = add_checkpoint_to_user(user.user_obj, cp_c)
+        
+        #get all ucp
+        ucp_lis = get_my_checkpoints(user.user_obj)
+        assert len(ucp_lis) == 3
+        
+        #like checkpoints
+        add_like(liker.user_obj, ucp_b)
+        
+        #sort nearest
+        nearest_ucp = sort_checkpoints(ucp_lis, "nearest", longitude = 0.0, latitude = 0.0)
+        assert nearest_ucp[0].id == ucp_a.id
+        assert nearest_ucp[1].id == ucp_b.id
+        assert nearest_ucp[2].id == ucp_c.id
+        
+        #sort newest
+        newest_ucp = sort_checkpoints(ucp_lis, "newest")
+        assert newest_ucp[0].id == ucp_c.id
+        assert newest_ucp[1].id == ucp_b.id
+        assert newest_ucp[2].id == ucp_a.id
+        
+        #sort popularity
+        popular_ucp = sort_checkpoints(ucp_lis, "popular")
+        assert popular_ucp[0].id == ucp_b.id
     
     def test_get_nearby_checkpoints(self):
         """

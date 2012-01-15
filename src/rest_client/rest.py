@@ -15,7 +15,9 @@ def unserialize_json_datetime(json_str):
     return datetime.strptime(json_str, DATEFORMAT)
     
 def serialize_json_datetime(datetime_obj):
-    return datetime.strftime(DATEFORMAT, datetime_obj)
+    if not datetime_obj is None:
+        return datetime_obj.strftime(DATEFORMAT)
+    return None
 
 class Request():
     """

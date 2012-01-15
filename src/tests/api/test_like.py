@@ -6,7 +6,7 @@ class LikeAPITest(TestBase):
     
     def test_new_like(self):
         """
-        Unit Test API for instantiating a new Like (like/put)
+        Unit Test API for instantiating a new CheckpointLike (like/put)
         """
         
         test_user_with_checkpoint = self.create_saved_test_user_with_checkpoint()

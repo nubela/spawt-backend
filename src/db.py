@@ -2,6 +2,8 @@ from ctrleff import get_app
 from flaskext.sqlalchemy import SQLAlchemy
 from local_config import SQL_URI
 from sqlalchemy.dialects.mysql.base import DOUBLE
+from rest_client.rest import serialize_json_datetime
+from action.serve import get_checkpoint_img_url
 
 app = get_app()
 app.config['SQLALCHEMY_DATABASE_URI'] = SQL_URI
@@ -51,10 +53,11 @@ class Checkpoint(db.Model):
                 "name": self.name,
                 "description": self.description,
                 "price": self.price,
-                "expiry": self.expiry.isoformat(),
-                "date_created": self.date_created.isoformat(),
+                "expiry": serialize_json_datetime(self.expiry),
+                "date_created": serialize_json_datetime(self.date_created),
                 "type": self.type,
                 "image": self.image,
+                "image_url": get_checkpoint_img_url(self),
                 "longitude": self.longitude,
                 "latitude": self.latitude
                 }
@@ -94,6 +97,7 @@ class UserCheckpoint(db.Model):
         """
         return {
                 "id": self.id,
+                "user_id": self.user_id,
                 "checkpoint": self.checkpoint.serialize
                 }
     
@@ -116,10 +120,22 @@ class Comment(db.Model):
     timestamp = db.Column(db.DateTime)
     checkpoint_id = db.Column(db.Integer, db.ForeignKey('checkpoint.id'))
     checkpoint = db.relationship("Checkpoint")
+    
+    @property
+    def serialize(self):
+        """
+        Return this object data into an easily serializable form (For JSON)
+        """
+        return {"id": self.id,
+                "user_id": self.user_id,
+                "comment": self.comment,
+                "timestamp": serialize_json_datetime(self.timestamp),
+                "checkpoint_id": self.checkpoint_id,
+                }
 
-class Like(db.Model):
+class CheckpointLike(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    checkpoint_id = db.Column(db.Integer, db.ForeignKey('checkpoint.id'))
+    checkpoint_id = db.Column(db.Integer, db    .ForeignKey('checkpoint.id'))
     checkpoint = db.relationship("Checkpoint")
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship("User")
