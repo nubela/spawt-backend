@@ -137,7 +137,7 @@ class CheckpointAPITests(TestBase):
         
     def atest_get_checkpoint_mine(self):
         """
-        test the my-checkpoints functionalit
+        test the my-checkpoints functionality
                 getNewCheckpointBean().getUserBean().getUserId()).toString()));y of (get:checkpoint) api
         """
         #create users
@@ -156,6 +156,9 @@ class CheckpointAPITests(TestBase):
         assert not user_b.checkpoint_obj.name in response.data
         
     def test_get_checkpoint_details(self):
+        """
+        tests checkpoint detail api
+        """
         user_a = self.create_saved_test_user_with_checkpoint()
         user_b = self.create_saved_test_user()
         add_like(user_a.user_obj, user_a.user_checkpoint_obj)

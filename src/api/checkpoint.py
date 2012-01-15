@@ -65,7 +65,7 @@ def get_checkpoint():
                         "total_shares": res.total_shares,
                         "current_user_like": res.current_user_like,
                         "comments": comment_sanify(res.comments),
-                        "creator": res.creator,
+                        "user": res.user,
                         "checkpoint": res.user_checkpoint_obj.serialize,
                         "status": "ok",
                         })
@@ -80,7 +80,7 @@ def _checkpoint_details():
                                    "total_shares",
                                    "current_user_like",
                                    "comments",
-                                   "creator",                                   
+                                   "user",                                   
                                    ))
     
     user_id = request.args.get("user_id")
@@ -92,17 +92,17 @@ def _checkpoint_details():
     total_shares = get_total_shares(user_checkpoint_obj)
     current_user_like = (not get_like_w_attr(user_obj, user_checkpoint_obj.checkpoint) is None)
     comments = get_checkpoint_comments(user_checkpoint_obj.checkpoint)
-    creator_user_obj = get_user(user_checkpoint_obj.checkpoint.creator)
-    creator = {"full_name": creator_user_obj.facebook_user.name,
-               "facebook_portrait_url": "https://graph.facebook.com/%s/picture" % creator_user_obj.facebook_user.id,
-               }
+    checkpoint_user_obj = user_checkpoint_obj.user
+    user = {"name": checkpoint_user_obj.facebook_user.name,
+            "facebook_portrait_url": "https://graph.facebook.com/%s/picture" % checkpoint_user_obj.facebook_user.id,
+            }
     
     res = CheckpointDetail(user_checkpoint_obj,
                            total_likes,
                            total_shares,
                            current_user_like,
                            comments,
-                           creator
+                           user
                            )
     return res
 
