@@ -11,7 +11,6 @@ from tests.api.test_comment import CommentAPITest
 from tests.action.test_user_checkpoint import UserCheckpointActionTests
 from tests.action.test_authorization import AuthorizationTests
 
-
 import unittest
 
 if __name__ == "__main__":
