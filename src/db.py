@@ -131,6 +131,8 @@ class Comment(db.Model):
                 "comment": self.comment,
                 "timestamp": serialize_json_datetime(self.timestamp),
                 "checkpoint_id": self.checkpoint_id,
+                "facebook_profile_pic_url": "https://graph.facebook.com/%s/picture" % self.user.facebook_user.id,
+                "name": self.user.facebook_user.name,
                 }
 
 class CheckpointLike(db.Model):

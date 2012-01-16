@@ -24,7 +24,7 @@ def get_comment(id):
     return None
 
 
-def add_comment(user_obj, user_checkpoint_obj, comment):
+def add_comment(user_obj, user_checkpoint_obj, comment_txt):
     """
     Instantiates a new comment for a user on a Checkpoint
     """
@@ -36,7 +36,7 @@ def add_comment(user_obj, user_checkpoint_obj, comment):
     comment = Comment()
     comment.checkpoint_id = checkpoint_obj.id
     comment.user_id = user_obj.id
-    comment.comment = comment
+    comment.comment = comment_txt
     comment.timestamp = datetime.datetime.now() 
 
     db.session.add(comment)
