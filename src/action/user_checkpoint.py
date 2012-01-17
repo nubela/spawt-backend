@@ -30,6 +30,15 @@ def get_user_checkpoint_attr(user_obj, checkpoint_obj):
         return cp.first()
     return None
 
+def remove_checkpoint_from_user(user_obj, checkpoint_obj):
+    from db import db
+    
+    #ensure that user does own the user_checkpoint
+    user_checkpoint_obj = get_user_checkpoint_attr(user_obj, checkpoint_obj)
+    if not user_checkpoint_obj is None:
+        db.session.delete(user_checkpoint_obj)
+        db.session.commit()
+    
 def add_checkpoint_to_user(user_obj, checkpoint_obj):
     """
     Adds a record to the db table to reflect an addition of an NEW Checkpoint 

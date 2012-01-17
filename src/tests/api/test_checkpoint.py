@@ -15,7 +15,7 @@ from action.like import add_like
 
 class CheckpointAPITests(TestBase):
     
-    def atest_new_checkpoint(self):
+    def test_new_checkpoint(self):
         """
         test the new_checkpoint API
         """
@@ -46,7 +46,7 @@ class CheckpointAPITests(TestBase):
         response = self.client.put("/checkpoint/", data=data)
         assert "user_checkpoint_id" in response.data
         
-    def atest_new_invalid_checkpoint(self):
+    def test_new_invalid_checkpoint(self):
         """
         test the new_checkpoint API, with an invalid checkpoint (without expiry/price)
         """
@@ -76,7 +76,7 @@ class CheckpointAPITests(TestBase):
         response = self.client.put("/checkpoint/", data=data)
         assert "Requires at least a price or expiry." in response.data
         
-    def atest_get_checkpoint_search(self):
+    def test_get_checkpoint_search(self):
         """
         test the search functionality of (get:checkpoint) api 
         """
@@ -95,7 +95,7 @@ class CheckpointAPITests(TestBase):
         assert "ok" in response.data
         assert user_b.checkpoint_obj.name in response.data
         
-    def atest_get_checkpoint_near(self):
+    def test_get_checkpoint_near(self):
         """
         test the nearby-checkpoints functionality of (get:checkpoint) api 
         """
@@ -135,7 +135,7 @@ class CheckpointAPITests(TestBase):
         assert not a2_ucp.checkpoint.name in response.data
         assert a3_ucp.checkpoint.name in response.data
         
-    def atest_get_checkpoint_mine(self):
+    def test_get_checkpoint_mine(self):
         """
         test the my-checkpoints functionality
                 getNewCheckpointBean().getUserBean().getUserId()).toString()));y of (get:checkpoint) api
@@ -171,4 +171,20 @@ class CheckpointAPITests(TestBase):
         response = self.client.get("/checkpoint/?" + urllib.urlencode(data))
         json_res = simplejson.loads(response.data)
         assert json_res["current_user_like"] == True
+        assert json_res["status"] == "ok"
+        
+    def test_del_user_checkpoint(self):
+        """
+        unit tests for (delete:checkpoint) 
+        """
+        user = self.create_saved_test_user_with_checkpoint()
+        
+        data = {"user_id": user.user_obj.id,
+                "signature": gen_signature("delete", "checkpoint", gen_api_key(user.user_obj.access_token, user.user_obj.id)),
+                "checkpoint_id": user.user_checkpoint_obj.checkpoint_id,
+                }
+        
+        response = self.client.delete("/checkpoint/?" + urllib.urlencode(data))
+        json_res = simplejson.loads(response.data)
+        
         assert json_res["status"] == "ok"

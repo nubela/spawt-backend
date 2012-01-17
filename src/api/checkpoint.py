@@ -10,11 +10,12 @@ from api.common_lib import authorization_fail, missing_field_fail,\
 import simplejson
 from action.authorization import is_api_key_validated
 from action.user import get_user
-from action.checkpoint import add_checkpoint
+from action.checkpoint import add_checkpoint, get_checkpoint as get_checkpoint_action
 from action.location import add_location
 from action.user_checkpoint import add_checkpoint_to_user,\
     get_nearby_checkpoints, get_my_checkpoints, search_user_checkpoints,\
-    user_checkpoint_sanify, sort_checkpoints, get_user_checkpoint
+    user_checkpoint_sanify, sort_checkpoints, get_user_checkpoint,\
+    remove_checkpoint_from_user, get_user_checkpoint_attr
 from action.share import add_share as share_checkpoint, get_total_shares
 import base64
 from os.path import join
@@ -25,6 +26,27 @@ from rest_client.rest import unserialize_json_datetime
 from action.comment import comment_sanify, get_checkpoint_comments
 from collections import namedtuple
 from action.like import get_total_likes, get_like_w_attr
+
+def del_checkpoint():
+    """
+    (DELETE: checkpoint)
+    """
+    #req args
+    user_id = request.args.get("user_id")
+    signature = request.args.get("signature")
+    user_checkpoint_id = request.args.get("checkpoint_id")
+    
+    #generated vars
+    user_obj = get_user(user_id)
+    checkpoint_obj = get_checkpoint_action(user_checkpoint_id)
+    
+    if not authorize("delete", "checkpoint", user_id, signature):
+        return authorization_fail()
+    
+    remove_checkpoint_from_user(user_obj, checkpoint_obj)
+    
+    return jsonify({"status": "ok",
+                    })
 
 def get_checkpoint():
     """
@@ -241,3 +263,6 @@ def _register_api(app):
     
     app.add_url_rule('/checkpoint/', 
                      "get_checkpoints", get_checkpoint, methods=['GET'])
+    
+    app.add_url_rule('/checkpoint/', 
+                     "del_checkpoint", del_checkpoint, methods=['DELETE']) 
