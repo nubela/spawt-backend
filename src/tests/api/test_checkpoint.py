@@ -172,19 +172,3 @@ class CheckpointAPITests(TestBase):
         json_res = simplejson.loads(response.data)
         assert json_res["current_user_like"] == True
         assert json_res["status"] == "ok"
-        
-    def test_del_user_checkpoint(self):
-        """
-        unit tests for (delete:checkpoint) 
-        """
-        user = self.create_saved_test_user_with_checkpoint()
-        
-        data = {"user_id": user.user_obj.id,
-                "signature": gen_signature("delete", "checkpoint", gen_api_key(user.user_obj.access_token, user.user_obj.id)),
-                "checkpoint_id": user.user_checkpoint_obj.checkpoint_id,
-                }
-        
-        response = self.client.delete("/checkpoint/?" + urllib.urlencode(data))
-        json_res = simplejson.loads(response.data)
-        
-        assert json_res["status"] == "ok"
