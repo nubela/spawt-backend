@@ -47,9 +47,14 @@ class Checkpoint(db.Model):
         """
         Return this object data into an easily serializable form (For JSON)
         """
+        from action.like import get_total_likes_checkpoint
+        from action.comment import get_checkpoint_comments
+        from action.user import get_user
+        
         return {
                 "id": self.id,
                 "creator": self.creator,
+                "creator_name": get_user(self.creator).facebook_user.name,
                 "name": self.name,
                 "description": self.description,
                 "price": self.price,
@@ -59,7 +64,10 @@ class Checkpoint(db.Model):
                 "image": self.image,
                 "image_url": get_checkpoint_img_url(self),
                 "longitude": self.longitude,
-                "latitude": self.latitude
+                "latitude": self.latitude,
+                
+                "total_likes": get_total_likes_checkpoint(self),
+                "total_comments": get_checkpoint_comments(self).count(),
                 }
     
 class FriendConnection(db.Model):
@@ -89,6 +97,7 @@ class UserCheckpoint(db.Model):
     user = db.relationship("User")
     checkpoint_id = db.Column(db.Integer, db.ForeignKey('checkpoint.id'))
     checkpoint = db.relationship("Checkpoint")
+    date_added = db.Column(db.DateTime) 
     
     @property
     def serialize(self):
@@ -98,7 +107,8 @@ class UserCheckpoint(db.Model):
         return {
                 "id": self.id,
                 "user_id": self.user_id,
-                "checkpoint": self.checkpoint.serialize
+                "user_name": self.user.facebook_user.name,
+                "checkpoint": self.checkpoint.serialize,
                 }
     
 class UserCheckpointOptions(db.Model):

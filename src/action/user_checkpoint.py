@@ -1,7 +1,7 @@
 #===============================================================================
 # UserCheckpoint action layer 
 #===============================================================================
-from util.geo import bounding_box, proximity_sort
+from util.geo import bounding_box, proximity_sort, distance_between_points
 from sqlalchemy.sql.expression import and_, or_, union_all, alias
 from action.user import get_friends
 from collections import namedtuple
@@ -9,6 +9,19 @@ from action.checkpoint import CHECKPOINT_TYPES
 from action.common import _get_2_weeks_date_before
 from sqlalchemy.orm.util import aliased
 from action.like import get_total_likes
+import datetime
+
+def checkpoint_proximity(user_checkpoints, lat, lon):
+    """
+    returns a list of a dict containing usercheckpoint id, checkpoint ids, and their proximity 
+    from the given lat, lon coordinate
+    """
+    
+    lis = [{"user_checkpoint_id" : ucp.id,
+            "checkpoint_id": ucp.checkpoint.id,
+            "proximity_in_km": distance_between_points(lat, lon, ucp.checkpoint.latitude, ucp.checkpoint.longitude),
+            } for ucp in user_checkpoints]
+    return lis
 
 def get_user_checkpoint(id):
     """
@@ -53,6 +66,7 @@ def add_checkpoint_to_user(user_obj, checkpoint_obj):
     user_checkpoint = UserCheckpoint()
     user_checkpoint.user_id = user_obj.id
     user_checkpoint.checkpoint_id = checkpoint_obj.id
+    user_checkpoint.date_added = datetime.datetime.now()
     
     db.session.add(user_checkpoint)
     db.session.commit()
@@ -78,6 +92,7 @@ def add_existing_checkpoint_to_user(user_obj, user_checkpoint_obj):
     duplicated_ucp = UserCheckpoint()
     duplicated_ucp.user_id = user_obj.id
     duplicated_ucp.checkpoint_id = user_checkpoint_obj.checkpoint_id
+    duplicated_ucp.date_added = datetime.datetime.now()
     db.session.add(duplicated_ucp)
     
     #duplicate UserCheckpointOptions
@@ -102,6 +117,7 @@ def get_nearby_checkpoints(user_obj, point_coord, radius_in_kilometres):
     
     #bounding box
     lat, lon = point_coord[0], point_coord[1]
+    
     dlat, dlon = bounding_box(lat, lon, radius_in_kilometres)
     min_lat, max_lat = lat-dlat, lat+dlat
     min_lon, max_lon = lon-dlon, lon+dlon
@@ -116,7 +132,21 @@ def get_nearby_checkpoints(user_obj, point_coord, radius_in_kilometres):
                      join(UserCheckpoint.checkpoint).
                      filter(radius_cond))
     
-    ucp_namedtuples = _checkpoints_to_location_namedtuples(ucp_in_radius.all())
+    #removing dupes and making sure that the oldest creator always gets credited
+    unduped_ucp = {}
+    all_ucp = ucp_in_radius.all()
+    for ucp in all_ucp:
+        key = ucp.checkpoint.id 
+        if key in unduped_ucp:
+            compared_ucp = unduped_ucp[key]
+            if ucp.user_id == user_obj.id:
+                unduped_ucp[key] = ucp
+            elif ucp < compared_ucp and compared_ucp.user_id != user_obj.id: #older
+                unduped_ucp[key] = ucp
+        else: unduped_ucp[key] = ucp
+    all_ucp = [v for k,v in unduped_ucp.iteritems()]
+    
+    ucp_namedtuples = _checkpoints_to_location_namedtuples(all_ucp)
     sorted_ucp = proximity_sort((lat, lon), ucp_namedtuples, ucp_in_radius.count())
     
     #separate into friends and anon ucp
@@ -128,7 +158,7 @@ def get_nearby_checkpoints(user_obj, point_coord, radius_in_kilometres):
             friends += [ucp.user_checkpoint]
         else:
             anon += [ucp.user_checkpoint]
-            
+    
     return friends, anon
 
 def sort_checkpoints(ucp_lis, sort_method, **kwargs):

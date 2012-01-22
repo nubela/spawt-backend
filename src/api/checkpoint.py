@@ -10,7 +10,8 @@ from action.user import get_user
 from action.checkpoint import add_checkpoint
 from action.user_checkpoint import add_checkpoint_to_user,\
     get_nearby_checkpoints, get_my_checkpoints, search_user_checkpoints,\
-    user_checkpoint_sanify, sort_checkpoints, get_user_checkpoint
+    user_checkpoint_sanify, sort_checkpoints, get_user_checkpoint,\
+    checkpoint_proximity
 from action.share import add_share as share_checkpoint, get_total_shares
 from os.path import join
 from action.notification import get_my_notifications_by_date,\
@@ -19,6 +20,13 @@ from rest_client.rest import unserialize_json_datetime
 from action.comment import comment_sanify, get_checkpoint_comments
 from collections import namedtuple
 from action.like import get_total_likes, get_like_w_attr
+
+
+def _build_proximity(user_checkpoints, dic):
+    if request.args.get("longitude", False) and request.args.get("latitude", False):
+        lon = request.args.get("longitude")
+        lat = request.args.get("latitude")
+        dic["proximity"] = checkpoint_proximity(user_checkpoints, lat, lon)
 
 def get_checkpoint():
     """
@@ -39,17 +47,26 @@ def get_checkpoint():
         
     elif type == "near":
         friends_ucp, anon_ucp, notifications = _checkpoints_near_me()
-        return jsonify({"friends_checkpoints": user_checkpoint_sanify(friends_ucp),
-                        "anon_checkpoints": user_checkpoint_sanify(anon_ucp),
-                        "notifications": notification_sanify(notifications),
-                        "status": "ok", 
-                        })
+        lon = request.args.get("longitude")
+        lat = request.args.get("latitude")
+        
+        dic = {"friends_checkpoints": user_checkpoint_sanify(friends_ucp),
+               "anon_checkpoints": user_checkpoint_sanify(anon_ucp),
+               "notifications": notification_sanify(notifications),
+               "friends_proximity": checkpoint_proximity(friends_ucp, lat, lon),
+               "anon_proximity": checkpoint_proximity(anon_ucp, lat, lon),
+               "status": "ok", 
+               }
+        
+        return jsonify(dic)
         
     elif type == "mine":
         user_checkpoints = _my_checkpoints()
-        return jsonify({"checkpoints": user_checkpoint_sanify(user_checkpoints),
-                        "status": "ok", 
-                        })
+        dic = {"checkpoints": user_checkpoint_sanify(user_checkpoints),
+               "status": "ok"}
+        _build_proximity(user_checkpoints, dic)
+        
+        return jsonify(dic)
         
     else:
         #single checkpoint info
@@ -138,10 +155,12 @@ def _my_checkpoints():
     sort_method = request.args.get("sort_by", "newest") #can be newest, nearest, popular
     
     user_checkpoints = get_my_checkpoints(user)
-    sort_checkpoints(user_checkpoints, sort_method, 
-                     longitude=float(request.args.get("longitude", 0.0)),
-                     latitude=float(request.args.get("latitude", 0.0))
-                     )
+    user_checkpoints = sort_checkpoints(user_checkpoints, sort_method, 
+                                        longitude=float(request.args.get("longitude", 0.0)),
+                                        latitude=float(request.args.get("latitude", 0.0))
+                                        )
+    
+    
     
     return user_checkpoints 
 

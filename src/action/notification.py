@@ -36,11 +36,4 @@ def notification_sanify(notification_collection):
     sanify a queryset of Notifications for json.
     Separate Notification objects into various notification types.
     """
-    separated = {}
-    for n in notification_collection:
-        if n.type in NOTIFICATION_TYPES:
-            if n.type in separated:
-                separated[n.type] += [n.serialize]
-            else:
-                separated[n.type] = [n.serialize]
-    return separated
+    return [n.serialize for n in notification_collection]

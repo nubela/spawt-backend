@@ -42,7 +42,9 @@ def distance_between_points(lat1, lon1, lat2, lon2):
     """
     all args are in degrees
     WARNING: loss of absolute precision when points are near-antipodal
+    Returns in Kilometres
     """
+    lat1, lon1, lat2, lon2 = float(lat1), float(lon1), float(lat2), float(lon2)
     lat1 = radians(lat1)
     lat2 = radians(lat2)
     dlat = lat2 - lat1
