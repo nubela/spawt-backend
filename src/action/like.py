@@ -48,10 +48,13 @@ def delete_like(user_obj, user_checkpoint_obj):
     """
     Deletes a like record between a user and a Checkpoint if it exists
     """
-    from db import db
+    from db import db, Notification
     like_obj = get_like_w_attr(user_obj, user_checkpoint_obj.checkpoint)
+    notification_obj = Notification.query.filter_by(relevant_id = like_obj.id).all()
     if not like_obj is None:
         db.session.delete(like_obj)
+        for n in notification_obj:
+            db.session.delete(n)
         db.session.commit()
 
 def add_like(user_obj, user_checkpoint_obj):

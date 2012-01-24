@@ -11,7 +11,7 @@ from action.checkpoint import add_checkpoint
 from action.user_checkpoint import add_checkpoint_to_user,\
     get_nearby_checkpoints, get_my_checkpoints, search_user_checkpoints,\
     user_checkpoint_sanify, sort_checkpoints, get_user_checkpoint,\
-    checkpoint_proximity
+    checkpoint_proximity, get_recent_friend_user_checkpoints
 from action.share import add_share as share_checkpoint, get_total_shares
 from os.path import join
 from action.notification import get_my_notifications_by_date,\
@@ -47,10 +47,12 @@ def get_checkpoint():
         
     elif type == "near":
         friends_ucp, anon_ucp, notifications = _checkpoints_near_me()
+        recent_checkpoints = get_recent_friend_user_checkpoints(get_user(user_id))
         lon = request.args.get("longitude")
         lat = request.args.get("latitude")
         
-        dic = {"friends_checkpoints": user_checkpoint_sanify(friends_ucp),
+        dic = {"recent_checkpoints": [ucp.serialize for ucp in recent_checkpoints],
+               "friends_checkpoints": user_checkpoint_sanify(friends_ucp),
                "anon_checkpoints": user_checkpoint_sanify(anon_ucp),
                "notifications": notification_sanify(notifications),
                "friends_proximity": checkpoint_proximity(friends_ucp, lat, lon),

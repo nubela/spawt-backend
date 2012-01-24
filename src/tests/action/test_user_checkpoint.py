@@ -103,11 +103,18 @@ class UserCheckpointActionTests(TestBase):
         """
         user_a = self.create_saved_test_user()
         user_b = self.create_saved_test_user_with_checkpoint()
-        self.befriend_test_user(user_a, [user_b])
+        user_c = self.create_saved_test_user_with_checkpoint()
+        user_d = self.create_saved_test_user_with_checkpoint()
+        user_e = self.create_saved_test_user_with_checkpoint()
+        
+        self.befriend_test_user(user_a, [user_b, user_c, user_d])
+        
+        recent_ucp = get_recent_friend_user_checkpoints(user_a.user_obj, 2)
+        assert len(recent_ucp) == 2
         
         recent_ucp = get_recent_friend_user_checkpoints(user_a.user_obj)
-        
-        assert len(recent_ucp) == 1
+        for ucp in recent_ucp:
+            assert user_e.user_checkpoint_obj.id != ucp.id
         
     def test_search_user_checkpoints(self):
         """

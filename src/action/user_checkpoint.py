@@ -2,7 +2,7 @@
 # UserCheckpoint action layer 
 #===============================================================================
 from util.geo import bounding_box, proximity_sort, distance_between_points
-from sqlalchemy.sql.expression import and_, or_, union_all, alias
+from sqlalchemy.sql.expression import and_, or_, union_all, alias, desc
 from action.user import get_friends
 from collections import namedtuple
 from action.checkpoint import CHECKPOINT_TYPES
@@ -193,12 +193,12 @@ def get_my_checkpoints(user_obj):
     ucp = UserCheckpoint.query.filter_by(user_id=user_obj.id)
     return ucp.all() 
 
-def get_recent_friend_user_checkpoints(user_obj, cut_off_date=None):
+def get_recent_friend_user_checkpoints(user_obj, limit = None):
     """
     (faux notification) returns Checkpoints that were recently created by friends
     """
-    if cut_off_date is None:
-        cut_off_date = _get_2_weeks_date_before()
+    if limit == None:
+        limit = 8
     
     from db import UserCheckpoint, db, FacebookUser, User, FriendConnection, Checkpoint
     
@@ -211,11 +211,10 @@ def get_recent_friend_user_checkpoints(user_obj, cut_off_date=None):
          join(FacebookUser, FacebookUser.id == FriendConnection.fb_user_from).
          join(User, User.facebook_user_id == FacebookUser.id).
          filter(User.id == user_obj.id).
-         filter(Checkpoint.date_created > cut_off_date).
          filter(Checkpoint.creator == FriendUser.id)        
          )
     
-    return q.all()
+    return q.order_by(desc(Checkpoint.date_created)).limit(limit).all()
 
 def search_user_checkpoints(user_obj, search_term):
     """

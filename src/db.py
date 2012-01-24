@@ -4,6 +4,7 @@ from local_config import SQL_URI
 from sqlalchemy.dialects.mysql.base import DOUBLE
 from rest_client.rest import serialize_json_datetime
 from action.serve import get_checkpoint_img_url
+from action.notification import describe_notification
 
 app = get_app()
 app.config['SQLALCHEMY_DATABASE_URI'] = SQL_URI
@@ -176,7 +177,6 @@ class Notification(db.Model):
     relevant_id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(255), nullable=True)
     timestamp = db.Column(db.DateTime)
-    fresh = db.Column(db.Boolean)
     
     @property
     def serialize(self):
@@ -188,6 +188,8 @@ class Notification(db.Model):
                 "type": self.type,
                 "relevant_id": self.relevant_id,
                 "description": self.description,
-                "timestamp": self.timestamp.isoformat(),
-                "fresh": self.fresh
+                "timestamp": serialize_json_datetime(self.timestamp),
+                
+                #usable stuff
+                "meta": describe_notification(self)
                 }
