@@ -55,7 +55,7 @@ def add_share(user_from, user_to, user_checkpoint):
     db.session.commit()
     
     #add notification
-    add_notification(NOTIFICATION_TYPE, user_from, user_to, share.id)
+    add_notification(NOTIFICATION_TYPE, user_from, user_to, share.id, user_checkpoint.id)
     
     return share
     

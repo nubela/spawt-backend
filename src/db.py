@@ -175,7 +175,8 @@ class Notification(db.Model):
     affected_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     affected_user = db.relationship("User", primaryjoin="Notification.affected_user_id==User.id")
     relevant_id = db.Column(db.Integer, primary_key=True)
-    description = db.Column(db.String(255), nullable=True)
+    user_checkpoint_id = db.Column(db.Integer, db.ForeignKey('user_checkpoint.id'), nullable=True)
+    user_checkpoint = db.relationship("UserCheckpoint")
     timestamp = db.Column(db.DateTime)
     
     @property
@@ -187,7 +188,6 @@ class Notification(db.Model):
                 "id": self.id,
                 "type": self.type,
                 "relevant_id": self.relevant_id,
-                "description": self.description,
                 "timestamp": serialize_json_datetime(self.timestamp),
                 
                 #usable stuff

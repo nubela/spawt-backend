@@ -2,7 +2,8 @@
 # Action layer for Comment
 #===============================================================================
 import datetime
-from action.notification import add_notification
+from action.notification import add_notification,\
+    delete_notifications_w_relevance
 
 NOTIFICATION_TYPE = "new_like"
 
@@ -42,8 +43,7 @@ def add_comment(user_obj, user_checkpoint_obj, comment_txt):
     db.session.add(comment)
     db.session.commit()
     
-    #add notification
-    add_notification(NOTIFICATION_TYPE, user_obj, user_checkpoint_obj.user, comment.id)
+    add_notification(NOTIFICATION_TYPE, user_obj, user_checkpoint_obj.user, comment.id, user_checkpoint_obj.id)
     
     return comment
 
@@ -54,10 +54,11 @@ def del_comment(id):
     
     from db import db, Comment
     
-    comment = get_comment(id)
-    
+    comment = get_comment(id)    
     db.session.delete(comment)
     db.commit()
+    
+    delete_notifications_w_relevance("new_comment", id)
 
 def comment_sanify(collection):
     return [c.serialize for c in collection]

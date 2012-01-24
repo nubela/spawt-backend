@@ -2,7 +2,8 @@
 # Action layer for CheckpointLikes
 #===============================================================================
 import datetime
-from action.notification import add_notification
+from action.notification import add_notification,\
+    delete_notifications_w_user_checkpoint, delete_notifications_w_relevance
 
 NOTIFICATION_TYPE = "new_like"
 
@@ -50,11 +51,9 @@ def delete_like(user_obj, user_checkpoint_obj):
     """
     from db import db, Notification
     like_obj = get_like_w_attr(user_obj, user_checkpoint_obj.checkpoint)
-    notification_obj = Notification.query.filter_by(relevant_id = like_obj.id).all()
     if not like_obj is None:
+        delete_notifications_w_relevance("new_like", like_obj.id)
         db.session.delete(like_obj)
-        for n in notification_obj:
-            db.session.delete(n)
         db.session.commit()
 
 def add_like(user_obj, user_checkpoint_obj):
@@ -72,7 +71,7 @@ def add_like(user_obj, user_checkpoint_obj):
     from db import CheckpointLike, db
     
     like_obj = CheckpointLike()
-    like_obj.checkpoint_id = checkpoint_obj.id
+    like_obj.checkpoint_id = user_checkpoint_obj.checkpoint.id
     like_obj.timestamp = datetime.datetime.now()
     like_obj.user_id = user_obj.id
     
@@ -80,7 +79,7 @@ def add_like(user_obj, user_checkpoint_obj):
     db.session.commit()
     
     #add notification
-    add_notification(NOTIFICATION_TYPE, user_obj, user_checkpoint_obj.user, like_obj.id)
+    add_notification(NOTIFICATION_TYPE, user_obj, user_checkpoint_obj.user, like_obj.id, user_checkpoint_obj.id)
     
     return like_obj
     

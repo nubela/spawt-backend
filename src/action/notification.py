@@ -3,7 +3,7 @@ from action.common import _get_2_weeks_date_before
 
 NOTIFICATION_TYPES = ("new_like", "new_comment", "new_share")
 
-def add_notification(type, from_user, to_user, obj_id, description=None):
+def add_notification(type, from_user, to_user, obj_id, user_checkpoint_id = None):
     from db import Notification, db
     
     new_notification = Notification()
@@ -11,13 +11,33 @@ def add_notification(type, from_user, to_user, obj_id, description=None):
     new_notification.from_user_id = from_user.id
     new_notification.affected_user_id = to_user.id
     new_notification.relevant_id = obj_id
-    new_notification.description = description
     new_notification.timestamp = datetime.datetime.now()
+    new_notification.user_checkpoint_id = user_checkpoint_id
     
     db.session.add(new_notification)
     db.session.commit()
     
     return new_notification
+
+def delete_notifications_w_relevance(type, relevant_obj_id):
+    """
+    deletes notifications that involves the stated user_checkpoint
+    """
+    from db import db, Notification
+    relevant_notifications = Notification.query.filter_by(relevant_id=relevant_obj_id, type=type).all()
+    for n in relevant_notifications:
+        db.session.delete(n)
+    db.session.commit()
+
+def delete_notifications_w_user_checkpoint(ucp_obj):
+    """
+    deletes notifications that involves the stated user_checkpoint
+    """
+    from db import db, Notification
+    relevant_notifications = Notification.query.filter_by(user_checkpoint_id = ucp_obj.id).all()
+    for n in relevant_notifications:
+        db.session.delete(n)
+    db.session.commit()
 
 def get_my_notifications_by_date(user_obj, cut_off_date = None):
     """
@@ -58,12 +78,10 @@ def describe_notification(notification_obj):
     ucp_url = None
     
     relevant_user_name = notification_obj.from_user.facebook_user.name
-    print notification_obj.id
     
     if notification_obj.type == "new_like":
         #format: XXX likes your Checkpoint: "Chicken Rice"
         like_obj = get_like(notification_obj.relevant_id)
-        print notification_obj.affected_user.id , like_obj.checkpoint.id
         user_checkpoint_obj = get_user_checkpoint_attr(notification_obj.affected_user, like_obj.checkpoint)
         
         ucp_id = user_checkpoint_obj.id

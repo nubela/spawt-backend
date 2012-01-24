@@ -10,6 +10,7 @@ from action.common import _get_2_weeks_date_before
 from sqlalchemy.orm.util import aliased
 from action.like import get_total_likes
 import datetime
+from action.notification import delete_notifications_w_user_checkpoint
 
 def checkpoint_proximity(user_checkpoints, lat, lon):
     """
@@ -49,6 +50,7 @@ def remove_checkpoint_from_user(user_obj, checkpoint_obj):
     #ensure that user does own the user_checkpoint
     user_checkpoint_obj = get_user_checkpoint_attr(user_obj, checkpoint_obj)
     if not user_checkpoint_obj is None:
+        delete_notifications_w_user_checkpoint(user_checkpoint_obj)
         db.session.delete(user_checkpoint_obj)
         db.session.commit()
     
