@@ -14,8 +14,7 @@ from action.user_checkpoint import add_checkpoint_to_user,\
     checkpoint_proximity, get_recent_friend_user_checkpoints
 from action.share import add_share as share_checkpoint, get_total_shares
 from os.path import join
-from action.notification import get_my_notifications_by_date,\
-    notification_sanify
+from action.notification import notification_sanify, get_my_notifications
 from rest_client.rest import unserialize_json_datetime
 from action.comment import comment_sanify, get_checkpoint_comments
 from collections import namedtuple
@@ -143,7 +142,7 @@ def _checkpoints_near_me():
     user = get_user(user_id) 
     
     friends_ucp, anon_ucp = get_nearby_checkpoints(user, point_coord, radius)
-    notifications = get_my_notifications_by_date(user)
+    notifications = get_my_notifications(user)
                                                      
     return friends_ucp, anon_ucp, notifications
     

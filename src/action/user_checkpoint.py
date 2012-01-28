@@ -49,6 +49,10 @@ def remove_checkpoint_from_user(user_obj, checkpoint_obj):
     
     #ensure that user does own the user_checkpoint
     user_checkpoint_obj = get_user_checkpoint_attr(user_obj, checkpoint_obj)
+    
+    #delete notifications
+    delete_notifications_w_user_checkpoint(user_checkpoint_obj)
+    
     if not user_checkpoint_obj is None:
         delete_notifications_w_user_checkpoint(user_checkpoint_obj)
         db.session.delete(user_checkpoint_obj)

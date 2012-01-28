@@ -33,9 +33,11 @@ def user_login():
                     "result": {
                         "user": {
                                  "id": user.id,
+                                 "name": user.facebook_user.name, 
                                  },
                         "friends": friends_lis,
                         "facebook_user_id": fb_user_info["id"],
+                        "facebook_portrait_url": "https://graph.facebook.com/%s/picture" % user.facebook_user.id,
                         "api_key": api_key,
                     }
                     })

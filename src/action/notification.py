@@ -1,5 +1,6 @@
 import datetime 
 from action.common import _get_2_weeks_date_before
+from sqlalchemy.sql.expression import desc
 
 NOTIFICATION_TYPES = ("new_like", "new_comment", "new_share")
 
@@ -47,7 +48,16 @@ def get_my_notifications_by_date(user_obj, cut_off_date = None):
         cut_off_date = _get_2_weeks_date_before()
     
     from db import db, Notification
-    notifications = Notification.query.filter_by(affected_user_id = user_obj.id).filter(Notification.timestamp > cut_off_date)
+    notifications = Notification.query.filter_by(affected_user_id = user_obj.id).filter(Notification.timestamp > cut_off_date).order_by(desc(Notification.timestamp))
+    return notifications.all()
+
+def get_my_notifications(user_obj, limit=None):
+    from db import db, Notification
+    
+    if limit is None:
+        limit = 100
+    
+    notifications = Notification.query.filter_by(affected_user_id = user_obj.id).order_by(desc(Notification.timestamp)).limit(limit)
     return notifications.all()
 
 def notification_sanify(notification_collection):
@@ -93,7 +103,7 @@ def describe_notification(notification_obj):
         comment_obj = get_comment(notification_obj.relevant_id)
         user_checkpoint_obj = get_user_checkpoint_attr(notification_obj.affected_user, comment_obj.checkpoint)
         ucp_id = user_checkpoint_obj.id
-        ucp_url = get_checkpoint_img_url(like_obj.checkpoint)
+        ucp_url = get_checkpoint_img_url(user_checkpoint_obj.checkpoint)
         txt = "%s commented on Checkpoint: %s" % (relevant_user_name, comment_obj.checkpoint.name)
         
     elif notification_obj.type == "new_share":
@@ -101,7 +111,7 @@ def describe_notification(notification_obj):
         share_obj = get_share(notification_obj.relevant_id)
         user_checkpoint_obj = share_obj.user_checkpoint
         ucp_id = user_checkpoint_obj.id
-        ucp_url = get_checkpoint_img_url(like_obj.checkpoint)
+        ucp_url = get_checkpoint_img_url(user_checkpoint_obj.checkpoint)
         txt = "%s recommends you to check out a Checkpoint: %s" % (relevant_user_name, user_checkpoint_obj.checkpoint.name)
         
     return {"notification_text": txt,

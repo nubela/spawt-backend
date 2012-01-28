@@ -5,7 +5,7 @@ import datetime
 from action.notification import add_notification,\
     delete_notifications_w_relevance
 
-NOTIFICATION_TYPE = "new_like"
+NOTIFICATION_TYPE = "new_comment"
 
 def get_checkpoint_comments(checkpoint_obj):
     from db import Comment
