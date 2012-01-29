@@ -39,20 +39,20 @@ def add_share(user_from, user_to, user_checkpoint):
     Adds a share record to the database (if it does not exists)
     """
     share = get_share_w_attr(user_from, user_to, user_checkpoint)
-    if not share is None:
-        return share
     
-    from db import db, Share
-    now = datetime.datetime.now()
+    if share is None:
     
-    share = Share()
-    share.user_from_id = user_from.id
-    share.user_to_id = user_to.id
-    share.user_checkpoint_id = user_checkpoint.id
-    share.timestamp = now
-    
-    db.session.add(share)
-    db.session.commit()
+        from db import db, Share
+        now = datetime.datetime.now()
+        
+        share = Share()
+        share.user_from_id = user_from.id
+        share.user_to_id = user_to.id
+        share.user_checkpoint_id = user_checkpoint.id
+        share.timestamp = now
+        
+        db.session.add(share)
+        db.session.commit()
     
     #add notification
     add_notification(NOTIFICATION_TYPE, user_from, user_to, share.id, user_checkpoint.id)

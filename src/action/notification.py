@@ -5,6 +5,11 @@ from sqlalchemy.sql.expression import desc
 NOTIFICATION_TYPES = ("new_like", "new_comment", "new_share")
 
 def add_notification(type, from_user, to_user, obj_id, user_checkpoint_id = None):
+    
+    #make sure its not a self-notification
+    if from_user.id == to_user.id:
+        return None
+    
     from db import Notification, db
     
     new_notification = Notification()
