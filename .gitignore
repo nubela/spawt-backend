@@ -1,4 +1,5 @@
-resources
+resources/uploads
+resources/test
 .settings
 .*project
 v_env/
