@@ -16,7 +16,8 @@ def get_likes_user(user_obj):
     likes = (db.session.query(CheckpointLike).
              join(CheckpointLike.checkpoint).
              join(UserCheckpoint, UserCheckpoint.checkpoint_id == Checkpoint.id).
-             filter(UserCheckpoint.user_id == user_obj.id)
+             filter(UserCheckpoint.user_id == user_obj.id).
+             filter(CheckpointLike.user_id != user_obj.id)
              )
     
     return likes.all()

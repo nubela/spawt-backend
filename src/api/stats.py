@@ -22,12 +22,9 @@ def get_stats():
     liked_cp = get_likes_user(user_obj)
     reshared_cp = get_shares_user(user_obj)
     
-    liked_filtered = filter(lambda x: x.user_id != user_id, liked_cp)
-    reshared_filtered = filter(lambda x: x.user_from_id != user_id, reshared_cp)
-    
     return jsonify({"status": "ok",
-                    "total_likes": len(liked_filtered),
-                    "total_reshares": len(reshared_filtered),
+                    "total_likes": len(liked_cp),
+                    "total_reshares": len(reshared_cp),
                     })
 
 def _register_api(app):
