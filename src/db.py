@@ -43,6 +43,10 @@ class Checkpoint(db.Model):
     longitude = db.Column(DOUBLE)
     latitude = db.Column(DOUBLE)
     
+    #for app wizard (new accounts)
+    img_location = db.Column(db.String(255), nullable=True)
+    demo = db.Column(db.Boolean)
+    
     @property
     def serialize(self):
         """

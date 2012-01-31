@@ -19,10 +19,12 @@ def get_checkpoint(id):
         return cp.first()
     return None
 
-def add_checkpoint(creator_id, name, type, image, longitude, latitude, description=None, price=None, expiry=None):
+def add_checkpoint(creator_id, name, type, image, longitude, latitude, description=None, price=None, expiry=None, demo=None):
     """
     Creates a Checkpoint record in the database with the supplied arguments
     """
+    if demo is None:
+        demo = False
     
     from db import Checkpoint, db
 
@@ -37,6 +39,7 @@ def add_checkpoint(creator_id, name, type, image, longitude, latitude, descripti
     checkpoint.date_created = datetime.datetime.now()
     checkpoint.type = type
     checkpoint.image = image
+    checkpoint.demo = demo
      
     db.session.add(checkpoint)
     db.session.commit() 

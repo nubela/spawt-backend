@@ -12,7 +12,7 @@ from util import random_string
 import Image
 import ExifTags
 
-MOBILE_OPTIMIZED_WIDTH = 480
+MOBILE_OPTIMIZED_WIDTH = 1280
 MOBILE_OPTIMIZED_FILENAME_APPEND = "_optimized"
 app = get_app()
     
@@ -32,9 +32,17 @@ def resize_img(img_path, basewidth=MOBILE_OPTIMIZED_WIDTH):
         elif exif[orientation] == 8 : 
             img = img.rotate(90, expand=True)
     
+    w, h = img.size
+    
+    wsize = basewidth 
     wpercent = (basewidth/float(img.size[0]))
     hsize = int((float(img.size[1])*float(wpercent)))
-    img = img.resize((basewidth,hsize), Image.ANTIALIAS)
+    if w > h:
+        hsize = basewidth
+        hpercent = (basewidth/float(img.size[1]))
+        wsize = int((float(img.size[0])*float(hpercent)))
+    
+    img = img.resize((wsize,hsize), Image.ANTIALIAS)
     
     filename = os.path.basename(os.path.splitext(img_path)[0])
     parent = os.path.dirname(img_path)

@@ -21,3 +21,10 @@ def add_friend_connection(fb_user_a, fb_user_b):
         
         db.session.add(friend_connection)
         db.session.commit()
+        
+def sanify_friends(friends):
+    friends_lis = [{"user_id": f.id,
+                    "facebook_user_id": f.facebook_user_id,
+                    "full_name": f.facebook_user.name,
+                    } for f in friends]
+    return friends_lis

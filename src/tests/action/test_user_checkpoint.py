@@ -20,6 +20,8 @@ class UserCheckpointActionTests(TestBase):
         user = self.create_saved_test_user()
         liker = self.create_saved_test_user()
         
+        demo_cp = get_my_checkpoints(user.user_obj)
+        
         #create various checkpoints (mocked data) for sorting
         cp_a_data = CheckpointTests.mock_checkpoint_data(user.user_obj.id, (0.0,0.0))
         cp_b_data = CheckpointTests.mock_checkpoint_data(user.user_obj.id, (1.0,1.0))
@@ -37,7 +39,7 @@ class UserCheckpointActionTests(TestBase):
         
         #get all ucp
         ucp_lis = get_my_checkpoints(user.user_obj)
-        assert len(ucp_lis) == 3
+        assert len(ucp_lis) == 3 + len(demo_cp)
         
         #like checkpoints
         add_like(liker.user_obj, ucp_b)
@@ -94,8 +96,13 @@ class UserCheckpointActionTests(TestBase):
         """
         unit test for get_my_checkpoints()
         """
-        user = self.create_saved_test_user_with_checkpoint()
-        assert len(get_my_checkpoints(user.user_obj)) == 1
+        #test demo checkpoints
+        user = self.create_saved_test_user()
+        demo_cp_count = len(get_my_checkpoints(user.user_obj))
+        assert demo_cp_count > 0
+        
+        user2 = self.create_saved_test_user_with_checkpoint()
+        assert len(get_my_checkpoints(user2.user_obj)) == demo_cp_count + 1
         
     def test_get_recent_friend_user_checkpoints(self):
         """

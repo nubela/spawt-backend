@@ -20,7 +20,6 @@ from action.comment import comment_sanify, get_checkpoint_comments
 from collections import namedtuple
 from action.like import get_total_likes, get_like_w_attr
 
-
 def _build_proximity(user_checkpoints, dic):
     if request.args.get("longitude", False) and request.args.get("latitude", False):
         lon = request.args.get("longitude")

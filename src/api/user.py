@@ -7,6 +7,7 @@ from local_config import APP_ID, APP_SECRET
 from flask.globals import request
 from action.authorization import gen_api_key
 from action.user import save_user, get_friends
+from action.friend_connection import sanify_friends
 
 def user_login():
     """
@@ -22,12 +23,7 @@ def user_login():
     
     fb_user_info, user = save_user(access_token, fb_code)
     api_key = gen_api_key(access_token, user.id)
-
-    friends_obj = get_friends(user, exclude_self=True)
-    friends_lis = [{"user_id": f.id,
-                    "facebook_user_id": f.facebook_user_id,
-                    "full_name": f.facebook_user.name,
-                    } for f in friends_obj]
+    friends = get_friends(user, exclude_self=True)
 
     return jsonify({"status": "ok",
                     "result": {
@@ -35,7 +31,7 @@ def user_login():
                                  "id": user.id,
                                  "name": user.facebook_user.name, 
                                  },
-                        "friends": friends_lis,
+                        "friends": sanify_friends(friends),
                         "facebook_user_id": fb_user_info["id"],
                         "facebook_portrait_url": "https://graph.facebook.com/%s/picture" % user.facebook_user.id,
                         "api_key": api_key,

@@ -136,7 +136,9 @@ def get_nearby_checkpoints(user_obj, point_coord, radius_in_kilometres):
     
     ucp_in_radius = (db.session.query(UserCheckpoint).
                      join(UserCheckpoint.checkpoint).
-                     filter(radius_cond))
+                     filter(radius_cond).
+                     filter(Checkpoint.demo == False)
+                     )
     
     #removing dupes and making sure that the oldest creator always gets credited
     unduped_ucp = {}
@@ -217,7 +219,8 @@ def get_recent_friend_user_checkpoints(user_obj, limit = None):
          join(FacebookUser, FacebookUser.id == FriendConnection.fb_user_from).
          join(User, User.facebook_user_id == FacebookUser.id).
          filter(User.id == user_obj.id).
-         filter(Checkpoint.creator == FriendUser.id)        
+         filter(Checkpoint.creator == FriendUser.id).
+         filter(Checkpoint.demo == False)
          )
     
     return q.order_by(desc(Checkpoint.date_created)).limit(limit).all()
@@ -239,7 +242,8 @@ def search_user_checkpoints(user_obj, search_term):
            join(FriendConnection, FriendConnection.fb_user_to == FriendFacebookUser.id).
            join(FacebookUser, FacebookUser.id == FriendConnection.fb_user_from).
            join(User, User.facebook_user_id == FacebookUser.id).
-           filter(or_(User.id == user_obj.id, FriendUser.id == user_obj.id))        
+           filter(or_(User.id == user_obj.id, FriendUser.id == user_obj.id)).
+           filter(Checkpoint.demo == False)        
            )
     
     name_search = ucp.filter(Checkpoint.name.ilike(search_term_with_wildcard))

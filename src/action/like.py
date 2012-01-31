@@ -7,6 +7,14 @@ from action.notification import add_notification,\
 
 NOTIFICATION_TYPE = "new_like"
 
+def get_likes_user(user_obj):
+    """
+    returns all the likes a user has
+    """
+    from db import CheckpointLike, db
+    likes = CheckpointLike.query.filter_by(user_id == user_obj.id)
+    return likes
+
 def get_total_likes_checkpoint(checkpoint_obj):
     """
     get the total count of likes for a user checkpoint obj (given the id)

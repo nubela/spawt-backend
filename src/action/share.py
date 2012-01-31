@@ -9,6 +9,16 @@ from action.notification import add_notification
 FACEBOOK_SHARE_CAPTION = "Another experience captured by ctrlEFF"
 NOTIFICATION_TYPE = "new_share"
 
+def get_shares_user(user_obj):
+    """
+    gets the recommended share records derived from this user's checkpoints 
+    """
+    from db import Share, db, UserCheckpoint
+    shares = (db.session.query(Share).
+              join(Share.user_checkpoint).
+              filter(UserCheckpoint.user_id == user_obj))
+    return shares.all()
+
 def get_total_shares(user_checkpoint_obj):
     from db import Share
     shares = Share.query.filter_by(user_checkpoint_id=user_checkpoint_obj.id)

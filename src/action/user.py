@@ -2,6 +2,7 @@ from facebook.facebook import FacebookApi
 from action.facebook_user import addupdate_facebook_user, get_facebook_user
 from action.friend_connection import add_friend_connection
 from sqlalchemy.orm.util import aliased
+from action.demo import create_demo_checkpoints
 
 def save_user(access_token, auth_code):
     """
@@ -23,7 +24,7 @@ def save_user(access_token, auth_code):
 
 def update_social_graph(access_token, fb_user=None):
     """
-    Include fb_user for performance (1 less FB API to call)
+    Note: Include fb_user for performance (1 less FB API to call)
     """
     
     #get friends
@@ -61,6 +62,8 @@ def addupdate_user(fb_user, email, access_token, auth_code):
     
     if not user:
         user = User()
+    else:
+        return user
         
     user.facebook_user_id = fb_user
     user.email = email
@@ -69,6 +72,8 @@ def addupdate_user(fb_user, email, access_token, auth_code):
         
     db.session.add(user)
     db.session.commit()
+    
+    create_demo_checkpoints(user)
     
     return user
 
