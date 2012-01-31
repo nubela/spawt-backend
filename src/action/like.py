@@ -11,9 +11,15 @@ def get_likes_user(user_obj):
     """
     returns all the likes a user has
     """
-    from db import CheckpointLike, db
-    likes = CheckpointLike.query.filter_by(user_id == user_obj.id)
-    return likes
+    from db import CheckpointLike, db, UserCheckpoint, Checkpoint
+    
+    likes = (db.session.query(CheckpointLike).
+             join(CheckpointLike.checkpoint).
+             join(UserCheckpoint, UserCheckpoint.checkpoint_id == Checkpoint.id).
+             filter(UserCheckpoint.user_id == user_obj.id)
+             )
+    
+    return likes.all()
 
 def get_total_likes_checkpoint(checkpoint_obj):
     """

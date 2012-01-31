@@ -11,6 +11,8 @@ from tests.api.test_comment import CommentAPITest
 from tests.api.test_user_checkpoint import UserCheckpointAPITests
 from tests.action.test_user_checkpoint import UserCheckpointActionTests
 from tests.action.test_authorization import AuthorizationTests
+from tests.api.test_friends import FriendsApiTest
+from tests.api.test_stats import StatsApiTest
 
 import unittest
 

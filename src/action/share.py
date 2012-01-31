@@ -16,7 +16,7 @@ def get_shares_user(user_obj):
     from db import Share, db, UserCheckpoint
     shares = (db.session.query(Share).
               join(Share.user_checkpoint).
-              filter(UserCheckpoint.user_id == user_obj))
+              filter(UserCheckpoint.user_id == user_obj.id))
     return shares.all()
 
 def get_total_shares(user_checkpoint_obj):

@@ -65,7 +65,6 @@ def get_checkpoint():
         dic = {"checkpoints": user_checkpoint_sanify(user_checkpoints),
                "status": "ok"}
         _build_proximity(user_checkpoints, dic)
-        
         return jsonify(dic)
         
     else:

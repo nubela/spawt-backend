@@ -10,8 +10,8 @@ from action.share import get_shares_user
 from flask.helpers import jsonify
 
 def get_stats():
-    user_id = request.form.get("user_id")
-    signature = request.form.get("signature")
+    user_id = request.args.get("user_id")
+    signature = request.args.get("signature")
     
     if not authorize("get", "stats", user_id, signature):
         return authorization_fail()
