@@ -2,7 +2,7 @@
 # backend for ctrleff
 #===============================================================================
 from flask import Flask
-from local_config import API_TO_REGISTER
+from local_config import API_TO_REGISTER, LOG_FILE
 import api 
 
 #utils
@@ -39,7 +39,7 @@ def get_app(static=None):
     if not app.debug:
         import logging
         from logging import FileHandler
-        file_handler = FileHandler("log.txt")
+        file_handler = FileHandler(LOG_FILE)
         file_handler.setLevel(logging.INFO)
         app.logger.addHandler(file_handler)
     
