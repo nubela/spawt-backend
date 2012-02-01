@@ -2,8 +2,7 @@
 # util lib for serving static/media 
 #===============================================================================
 import os
-
-BASE_URL = "http://192.168.1.111:5000"
+from local_config import BASE_URL
 
 def get_checkpoint_img_url(cp_obj):
     filename = os.path.splitext(cp_obj.image)[0]
