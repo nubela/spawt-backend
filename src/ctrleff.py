@@ -38,13 +38,10 @@ def get_app(static=None):
     #email logger
     if not app.debug:
         import logging
-        ADMINS = ['nubela@ctrleff.com']
-        from logging.handlers import SMTPHandler
-        mail_handler = SMTPHandler('127.0.0.1',
-                                   'server-error@ctrleff.com',
-                                   ADMINS, 'ctrlEFF Fail')
-        mail_handler.setLevel(logging.INFO)
-        app.logger.addHandler(mail_handler)
+        from logging import FileHandler
+        file_handler = FileHandler("log.txt")
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
     
     return app
 
