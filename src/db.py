@@ -34,7 +34,7 @@ class Checkpoint(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String(255))
-    description = db.Column(db.String(255), nullable=True)
+    description = db.Column(db.String(10000), nullable=True)
     price = db.Column(db.Float, nullable=True)
     expiry = db.Column(db.DateTime, nullable=True)
     date_created = db.Column(db.DateTime)
