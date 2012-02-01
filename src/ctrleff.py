@@ -34,6 +34,17 @@ def get_app(static=None):
         app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
           '/': os.path.join(os.path.dirname(__file__), 'static')
         })
+        
+    #email logger
+    if not app.debug:
+        import logging
+        ADMINS = ['nubela@ctrleff.com']
+        from logging.handlers import SMTPHandler
+        mail_handler = SMTPHandler('127.0.0.1',
+                                   'server-error@ctrleff.com',
+                                   ADMINS, 'ctrlEFF Fail')
+        mail_handler.setLevel(logging.INFO)
+        app.logger.addHandler(mail_handler)
     
     return app
 

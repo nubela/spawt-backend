@@ -12,7 +12,7 @@ from util import random_string
 import Image
 import ExifTags
 
-MOBILE_OPTIMIZED_WIDTH = 1280
+MOBILE_OPTIMIZED_WIDTH = 480
 MOBILE_OPTIMIZED_FILENAME_APPEND = "_optimized"
 app = get_app()
     
