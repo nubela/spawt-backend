@@ -2,7 +2,7 @@ from os.path import join as j
 import datetime
 
 FOOD_NAME = "Succulent Sushi"
-FOOD_DESC = """Mm. Thats a yummy picture of succulent sushi. But firstly, hello!\n"
+FOOD_DESC = """Mm. Thats a yummy picture of succulent sushi. But firstly, hello!\n
 Thank you for trying out the app.\n 
 ctrlEFF allows you to capture experiences like this so you would never forget it.\n
 All you have to do is capture Checkpoints as you discover great experiences, such as this great sushi meal.\n
@@ -15,7 +15,7 @@ SHOP_DESC = """Cheap shoes from Bugis Street, prices are guaranteed to be cheap,
 Shopping Checkpoints are a great way for you to share shopping deals, great purchases, and sales promotions with your friends!\n
 Anytime your friends come by a location that you had saved a new Checkpoint, your Checkpoint would show up in "Checkpoints near you".\n
 And you too would be able to discover great experiences, be it shopping, or Food Checkpoints that your friends had saved before.\n
-But that is not all, check out the demo Play Checkpoint! 
+But that is not all, check out the next demo Checkpoint under Play!
 """
 PLAY_NAME = "Nightlife in Singapore"
 PLAY_DESC = """We have quite a few nightlife spots in Singapore, but how would you know which are the good ones?\n
@@ -24,7 +24,7 @@ or make a comment to the creator of the Checkpoint if you need more detailed rec
 The best thing is, if you like Checkpoints that you discover as you move about in your daily life using ctrlEFF, you can simply add it to your own catalog!\n
 And the Checkpoint will be saved in your catalog of "My Checkpoints".\n
 So yes! The next time you are wondering what to do next? Consult ctrlEFF. Your friends will always give a better recommendation that any guidebook can!\n
-Have fun!\n\n
+Have fun!\n
 PS: You can delete the Demo Checkpoints from the Menu options.
 """
 
