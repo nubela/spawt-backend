@@ -136,7 +136,7 @@ def _checkpoints_near_me():
     """
     user_id = request.args.get("user_id")
     point_coord = float(request.args.get("latitude")), float(request.args.get("longitude"))
-    radius = float(request.args.get("radius", 2))
+    radius = float(request.args.get("radius", 5))
     user = get_user(user_id) 
     
     friends_ucp, anon_ucp = get_nearby_checkpoints(user, point_coord, radius)
