@@ -1,3 +1,5 @@
+src/RESET_DB
+src/log.txt
 resources/uploads
 resources/test
 .settings
