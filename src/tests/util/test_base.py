@@ -14,7 +14,7 @@ class TestBase(unittest.TestCase):
     User = namedtuple("User", ("authcode", "fb_test_user", "fb_info", "user_obj", "checkpoint_obj", "user_checkpoint_obj"))
     
     def setUp(self):
-        self.app = get_app()
+        self.app = get_app(testing=True)
         #declare testing state
         self.app.config["TESTING"] = True
         self.db, self.app.config["DATABASE"] = tempfile.mkstemp()

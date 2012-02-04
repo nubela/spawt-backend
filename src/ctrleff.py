@@ -15,7 +15,7 @@ def get_resources_abs_path():
     here = realpath(__file__)
     return pjoin(pparent(pparent(here)) , "resources")
 
-def get_app(static=None):
+def get_app(static=None, testing=False):
     """
     factory for app
     """
@@ -42,6 +42,12 @@ def get_app(static=None):
         file_handler = FileHandler(LOG_FILE)
         file_handler.setLevel(logging.INFO)
         app.logger.addHandler(file_handler)
+    
+    if not testing:
+        @app.teardown_request
+        def shutdown_session(exception=None):
+            from db import db
+            db.session.remove()
     
     return app
 
