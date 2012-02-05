@@ -21,16 +21,20 @@ def resize_img(img_path, basewidth=MOBILE_OPTIMIZED_WIDTH):
     
     #rotate of exif info exists
     if not img._getexif() is None:
+        found_exif = False
         for orientation in ExifTags.TAGS.keys() : 
-            if ExifTags.TAGS[orientation]=='Orientation' : break
+            if ExifTags.TAGS[orientation]=='Orientation' :
+                found_exif = True
+                break
         exif=dict(img._getexif().items())
         
-        if exif[orientation] == 3: 
-            img = img.rotate(180, expand=True)
-        elif exif[orientation] == 6 : 
-            img = img.rotate(270, expand=True)
-        elif exif[orientation] == 8 : 
-            img = img.rotate(90, expand=True)
+        if orientation in exif and found_exif:
+            if exif[orientation] == 3: 
+                img = img.rotate(180, expand=True)
+            elif exif[orientation] == 6 : 
+                img = img.rotate(270, expand=True)
+            elif exif[orientation] == 8 : 
+                img = img.rotate(90, expand=True)
     
     w, h = img.size
     
