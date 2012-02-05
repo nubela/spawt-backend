@@ -34,9 +34,10 @@ def update_social_graph(access_token, fb_user=None):
         fb_user = get_facebook_user(fb_api.get_info()["id"])
     
     #save friends into db
-    for friend in all_friends["data"]:
-        fb_friend = addupdate_facebook_user(friend["id"], friend["name"], None, None, None, None, None, None)
-        add_friend_connection(fb_user, fb_friend)
+    if "data" in all_friends:
+        for friend in all_friends["data"]:
+            fb_friend = addupdate_facebook_user(friend["id"], friend["name"], None, None, None, None, None, None)
+            add_friend_connection(fb_user, fb_friend)
         
     return all_friends
 
