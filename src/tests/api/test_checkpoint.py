@@ -16,7 +16,7 @@ from flask.helpers import jsonify
 
 class CheckpointAPITests(TestBase):
     
-    def atest_new_checkpoint(self):
+    def test_new_checkpoint(self):
         """
         test the new_checkpoint API
         """
@@ -47,7 +47,7 @@ class CheckpointAPITests(TestBase):
         response = self.client.put("/checkpoint/", data=data)
         assert "user_checkpoint_id" in response.data
         
-    def atest_new_invalid_checkpoint(self):
+    def test_new_invalid_checkpoint(self):
         """
         test the new_checkpoint API, with an invalid checkpoint (without expiry/price)
         """
@@ -77,7 +77,7 @@ class CheckpointAPITests(TestBase):
         response = self.client.put("/checkpoint/", data=data)
         assert "Requires at least a price or expiry." in response.data
         
-    def atest_get_checkpoint_search(self):
+    def test_get_checkpoint_search(self):
         """
         test the search functionality of (get:checkpoint) api 
         """
@@ -148,7 +148,7 @@ class CheckpointAPITests(TestBase):
         assert not a2_ucp.checkpoint.name in simplejson.dumps(json_response["anon_checkpoints"])
         assert not a1_ucp.checkpoint.name in simplejson.dumps(json_response["anon_checkpoints"])
         
-    def atest_get_checkpoint_mine(self):
+    def test_get_checkpoint_mine(self):
         """
         test the my-checkpoints functionality
                 getNewCheckpointBean().getUserBean().getUserId()).toString()));y of (get:checkpoint) api
@@ -168,7 +168,7 @@ class CheckpointAPITests(TestBase):
         assert user_a.checkpoint_obj.name in response.data
         assert not user_b.checkpoint_obj.name in response.data
         
-    def atest_get_checkpoint_details(self):
+    def test_get_checkpoint_details(self):
         """
         tests checkpoint detail api
         """

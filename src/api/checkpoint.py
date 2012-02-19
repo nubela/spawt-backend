@@ -207,15 +207,14 @@ def new_checkpoint():
                         })
     
     #save image
-    from util.fileupload import save_file
-    upload_dir = join(get_resources_abs_path(), "uploads")
+    from util.fileupload import save_to_s3
     
     if image_encoded is None:
-        img_file_name = save_file(image, ".jpg", str(user.id), upload_dir, encoded=False)
-    else: 
-        img_file_name = save_file(image_encoded, ".jpg", str(user.id), upload_dir)
+        img_file_name = save_to_s3(user_id, image, encoded=False)
+    else:
+        img_file_name = save_to_s3(user_id, image_encoded) 
     
-    checkpoint = add_checkpoint(user_id, name, type, img_file_name, longitude, latitude, description, price, expiry_datetime)
+    checkpoint = add_checkpoint(user_id, name, type, img_file_name, longitude, latitude, description, price, expiry_datetime, img_location="s3")
     user_checkpoint  = add_checkpoint_to_user(user, checkpoint)
     
     #dispatch shares
