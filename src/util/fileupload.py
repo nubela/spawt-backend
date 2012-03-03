@@ -59,7 +59,7 @@ def resize_img(img_path, basewidth=MOBILE_OPTIMIZED_WIDTH):
 
 def save_to_s3(unique_identifier, post_file, encoded=None):
     """
-    Saves file to Amazon S3
+    Saves file to Amazon S3 with a unique identifier. (Can be a user id)
     """
     conn = S3.AWSAuthConnection(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
     generator = S3.QueryStringAuthGenerator(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
