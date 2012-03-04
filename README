@@ -1,0 +1,44 @@
+[ctrleff-backend - backend for ctrleff, powered by Flask, with Python]
+
+ctrl-EFF
+--------
+
+ctrl-EFF (Control-F) is a location-based experience bookmarking service. It is a startup conceived to solve the very problem of answering the question: "What should I do next?". We answer this question with the help of the social network effect with Checkpoints. Checkpoints are captured experiences that tells you what an experience is, where it is, and what your friends think about it.
+
+ctrleff-backend
+---------------
+
+This project contains the source code for the backend. This backend provides an API interface so that the clients (mobile app, web, whatever), can interface with the logic. It is written in Python, and managed by the Flask microframework.
+
+Requirements
+------------
+
+- python 2.6+
+- pip
+- virtualenv
+- python modules requirements in REQUIREMENTS file
+- PyDev plugin for Eclipse
+
+Setting up the project
+---------------------
+
+- Create a virtual environment for the project to be hosted in. Do this by doing this in the command line: virtualenv --no-site-packages v_env 
+    * Type this command in the folder of ctrleff-backend project
+- Then type this command: source v_env/bin/activate
+- Install the python module requirements by typing this: pip install -r REQUIREMENTS
+- Go to <PROJECT PATH>/src/
+- Create the database: python CREATE_DB.py
+
+Running unit tests
+------------------
+
+Running unit tests is one of the best ways to see if everything is set up fine. The unit tests tries to cover all the features in the app and tests to see if they are working as expected. You should always write new unit tests if you are working on a new feature.
+
+- Go to <PROJECT PATH>/src/
+- Run the python script: python run_tests.py
+
+Running the (debug) server
+--------------------------
+
+- Go to <PROJECT PATH>/src/
+- python ctrleff.py
