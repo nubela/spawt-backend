@@ -76,13 +76,13 @@ def save_to_s3(unique_identifier, post_file, tmp_folder, encoded=None):
     #upload orig file
     orig_file = open(absolute_write_path, "r")
     obj = S3Object(orig_file.read())
-    conn.put(S3_BUCKET_NAME, key, obj)
+    conn.put(S3_BUCKET_NAME, key + ".jpg", obj)
     
     #upload resized file
     resized_filename = os.path.splitext(file_name)[0] + "_optimized.jpg"
     resized_file = open(os.path.join(tmp_folder, resized_filename),"r")
     obj = S3Object(resized_file.read())
-    conn.put(S3_BUCKET_NAME, key, obj)
+    conn.put(S3_BUCKET_NAME, key+"_optimized.jpg", obj)
     
     #remove temp files
     os.remove(absolute_write_path)

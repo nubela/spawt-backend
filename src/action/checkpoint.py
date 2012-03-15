@@ -6,6 +6,7 @@ from util.util import exp
 from util.geo import proximity_sort
 from collections import namedtuple
 import datetime
+import simplejson
 
 CHECKPOINT_TYPES = ("food", "shop", "play")
 
@@ -19,7 +20,7 @@ def get_checkpoint(id):
         return cp.first()
     return None
 
-def add_checkpoint(creator_id, name, type, image, longitude, latitude, description=None, price=None, expiry=None, demo=None, img_location=None):
+def add_checkpoint(creator_id, name, type, image, longitude, latitude, description=None, price=None, expiry=None, demo=None, img_location=None, opts=None):
     """
     Creates a Checkpoint record in the database with the supplied arguments
     """
@@ -41,6 +42,8 @@ def add_checkpoint(creator_id, name, type, image, longitude, latitude, descripti
     checkpoint.image = image
     checkpoint.demo = demo
     checkpoint.img_location = img_location
+    if not opts is None: 
+        checkpoint.options = simplejson.dumps(opts)
      
     db.session.add(checkpoint)
     db.session.commit() 

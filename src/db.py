@@ -42,6 +42,7 @@ class Checkpoint(db.Model):
     image = db.Column(db.String(255))
     longitude = db.Column(DOUBLE)
     latitude = db.Column(DOUBLE)
+    options = db.Column(db.String(50000))
     
     #for app wizard (new accounts)
     img_location = db.Column(db.String(255), nullable=True)

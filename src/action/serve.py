@@ -11,6 +11,8 @@ def get_checkpoint_img_url(cp_obj):
     if cp_obj.img_location == "s3":
         generator = S3.QueryStringAuthGenerator(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
         url = generator.get(S3_BUCKET_NAME, cp_obj.image)
+        if len(cp_obj.image) != 8:
+            url = generator.get(S3_BUCKET_NAME, cp_obj.image + "_optimized.jpg" )
         return url
     
     #return local hosted url
