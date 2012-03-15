@@ -18,7 +18,11 @@ def migrate_s3():
         resources_dir = get_resources_abs_path()
         img_path = os.path.join(resources_dir,"uploads",str(cp.creator),cp.image)
         img_file = open(img_path, 'r') 
-        img_name = save_to_s3(cp.creator, img_file.read(), False)
+        img_name = save_to_s3(cp.creator, img_file.read(), resources_dir, False)
+        
+        img_path_optimized = os.path.join(resources_dir,"uploads",str(cp.creator),cp.image + "_optimized.jpg")
+        img_file_optimized = open(img_path_optimized, 'r') 
+        save_to_s3(cp.creator, img_file_optimized.read(), resources_dir, False)
         
         #update the checkpoint
         cp.img_location = "s3"
