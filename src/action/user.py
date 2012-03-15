@@ -18,7 +18,7 @@ def save_user(access_token, auth_code):
     fb_user = addupdate_facebook_user(fb_user_info["id"], fb_user_info["name"], fb_user_info.get("first_name",None), fb_user_info.get("middle_name",None), 
                                 fb_user_info.get("last_name",None), fb_user_info.get("gender",None), fb_user_info.get("username",None), fb_user_info["link"])
     user = addupdate_user(fb_user.id, fb_user_info["email"], access_token, auth_code)
-    update_social_graph(access_token, fb_user)
+    #update_social_graph(access_token, fb_user)
     
     return fb_user_info, user
 
@@ -38,10 +38,10 @@ def update_social_graph(access_token, fb_user=None):
         for friend in all_friends["data"]:
             fb_friend = addupdate_facebook_user(friend["id"], friend["name"], None, None, None, None, None, None, commit=False)
             add_friend_connection(fb_user, fb_friend, commit=False)
-    
+            
     from db import db
     db.session.commit()
-        
+
     return all_friends
 
 def get_user(id):
@@ -62,12 +62,11 @@ def addupdate_user(fb_user, email, access_token, auth_code):
     
     from db import db, User
     
+    new = False
     user = get_user_from_email(email)
-    
     if not user:
+        new = True
         user = User()
-    else:
-        return user
         
     user.facebook_user_id = fb_user
     user.email = email
@@ -77,7 +76,8 @@ def addupdate_user(fb_user, email, access_token, auth_code):
     db.session.add(user)
     db.session.commit()
     
-    create_demo_checkpoints(user)
+    if new:
+        create_demo_checkpoints(user)
     
     return user
 

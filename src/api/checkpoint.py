@@ -42,7 +42,7 @@ def get_checkpoint():
         return jsonify({"checkpoints": user_checkpoint_sanify(user_checkpoints),
                         "status": "ok", 
                         })
-        
+    
     elif type == "near":
         friends_ucp, anon_ucp, notifications = _checkpoints_near_me()
         recent_checkpoints = get_recent_friend_user_checkpoints(get_user(user_id))

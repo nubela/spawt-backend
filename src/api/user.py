@@ -23,6 +23,7 @@ def user_login():
     
     fb_user_info, user = save_user(access_token, fb_code)
     api_key = gen_api_key(access_token, user.id)
+    
     friends = get_friends(user, exclude_self=True)
 
     return jsonify({"status": "ok",

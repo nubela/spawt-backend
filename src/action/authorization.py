@@ -9,7 +9,7 @@ def gen_api_key(access_token, user_id):
     """
     given a auth_code, generate an api key 
     """
-    key = hashlib.sha1(access_token)
+    key = hashlib.sha1(str(access_token))
     unsalted_key = key.hexdigest()
     unsalted_key += str(user_id)
     
