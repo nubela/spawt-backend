@@ -9,7 +9,7 @@ def get_friend_connection(fb_user_from, fb_user_to):
     if friend_connection_a.count() > 0: return friend_connection_a
     return None
 
-def add_friend_connection(fb_user_a, fb_user_b):
+def add_friend_connection(fb_user_a, fb_user_b, commit=True):
     
     from db import db, FriendConnection
     
@@ -20,7 +20,8 @@ def add_friend_connection(fb_user_a, fb_user_b):
         friend_connection.fb_user_to = fb_user_b.id
         
         db.session.add(friend_connection)
-        db.session.commit()
+        if commit:
+            db.session.commit()
         
 def sanify_friends(friends):
     friends_lis = [{"user_id": f.id,

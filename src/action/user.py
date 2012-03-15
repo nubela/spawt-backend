@@ -36,8 +36,11 @@ def update_social_graph(access_token, fb_user=None):
     #save friends into db
     if "data" in all_friends:
         for friend in all_friends["data"]:
-            fb_friend = addupdate_facebook_user(friend["id"], friend["name"], None, None, None, None, None, None)
-            add_friend_connection(fb_user, fb_friend)
+            fb_friend = addupdate_facebook_user(friend["id"], friend["name"], None, None, None, None, None, None, commit=False)
+            add_friend_connection(fb_user, fb_friend, commit=False)
+    
+    from db import db
+    db.session.commit()
         
     return all_friends
 

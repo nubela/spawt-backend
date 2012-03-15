@@ -3,7 +3,7 @@ def get_facebook_user(id):
     return FacebookUser.query.get(id=id)
 
 def addupdate_facebook_user(fb_id, name, first_name, middle_name,
-                      last_name, gender, username, link):
+                      last_name, gender, username, link, commit=True):
     
     from db import db, FacebookUser
     
@@ -24,6 +24,7 @@ def addupdate_facebook_user(fb_id, name, first_name, middle_name,
     else:
         fb_user_obj = db.session.merge(fb_user)
 
-    db.session.commit()
+    if commit:
+        db.session.commit()
     
     return fb_user_obj

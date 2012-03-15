@@ -17,6 +17,7 @@ def migrate_s3():
         #save to s3
         resources_dir = get_resources_abs_path()
         img_path = os.path.join(resources_dir,"uploads",str(cp.creator),cp.image)
+        print img_path
         img_file = open(img_path, 'r') 
         img_name = save_to_s3(cp.creator, img_file.read(), resources_dir, False)
         
