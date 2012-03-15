@@ -57,7 +57,7 @@ def resize_img(img_path, basewidth=MOBILE_OPTIMIZED_WIDTH):
     img.save(os.path.join(parent, filename+MOBILE_OPTIMIZED_FILENAME_APPEND+".jpg"), "JPEG")
     return os.path.join(parent, filename+MOBILE_OPTIMIZED_FILENAME_APPEND+".jpg")
 
-def save_to_s3(unique_identifier, post_file, encoded=None):
+def save_to_s3(unique_identifier, post_file, tmp_folder, encoded=None):
     """
     Saves file to Amazon S3 with a unique identifier. (Can be a user id)
     """
@@ -69,8 +69,24 @@ def save_to_s3(unique_identifier, post_file, encoded=None):
     if not conn.check_bucket_exists(S3_BUCKET_NAME).status == 200:
         conn.create_located_bucket(S3_BUCKET_NAME, S3_LOCATION)
     
-    obj = S3Object(get_data_from_post_file(post_file, encoded))
+    #resize file
+    absolute_write_path, file_name = temp_save_file(post_file, ".jpg", encoded, tmp_folder)
+    resize_img(absolute_write_path)
+    
+    #upload orig file
+    orig_file = open(absolute_write_path, "r")
+    obj = S3Object(orig_file.read())
     conn.put(S3_BUCKET_NAME, key, obj)
+    
+    #upload resized file
+    resized_filename = os.path.splitext(file_name)[0] + "_optimized.jpg"
+    resized_file = open(os.path.join(tmp_folder, resized_filename),"r")
+    obj = S3Object(resized_file.read())
+    conn.put(S3_BUCKET_NAME, key, obj)
+    
+    #remove temp files
+    os.remove(absolute_write_path)
+    os.remove(os.path.join(tmp_folder, resized_filename))
     
     return key
 
@@ -84,6 +100,20 @@ def get_data_from_post_file(post_file, encoded=None):
     else: file_data = post_file.read()
     
     return file_data
+
+
+def temp_save_file(post_file, extension, encoded, working_dir):
+    file_data = get_data_from_post_file(post_file, encoded)
+    file_name = random_string() + extension
+    absolute_write_path = os.path.join(working_dir, file_name)
+    while os.path.exists(absolute_write_path):
+        file_name = random_string() + extension
+        absolute_write_path = os.path.join(working_dir, file_name)
+    
+    file = open(absolute_write_path, 'wb+')
+    file.write(file_data)
+    file.close()
+    return absolute_write_path, file_name
 
 def save_file(post_file, extension=None, subdir=None, dir_to_save=None, encoded=None):
     """
@@ -107,17 +137,7 @@ def save_file(post_file, extension=None, subdir=None, dir_to_save=None, encoded=
     if not os.path.exists(working_dir):
         os.makedirs(working_dir)
     
-    file_data = get_data_from_post_file(post_file, encoded)
-    
-    file_name = random_string() + extension
-    absolute_write_path = os.path.join(working_dir, file_name) 
-    while os.path.exists(absolute_write_path):
-        file_name = random_string() + extension 
-        absolute_write_path = os.path.join(working_dir, file_name)
-    
-    file = open(absolute_write_path,'wb+')
-    file.write(file_data)
-    file.close()
+    absolute_write_path, file_name = temp_save_file(post_file, extension, encoded, working_dir)
     
     resize_img(absolute_write_path)
     

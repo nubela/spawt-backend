@@ -160,7 +160,6 @@ def _my_checkpoints():
                                         )
     
     
-    
     return user_checkpoints 
 
 def new_checkpoint():
@@ -199,20 +198,14 @@ def new_checkpoint():
         print "fail"
         return authorization_fail()
     
-    #checkpoint validation check
-    if price is None and expiry is None:
-        return jsonify({
-                        "status": "error",
-                        "error": "Requires at least a price or expiry.",
-                        })
-    
     #save image
     from util.fileupload import save_to_s3
+    tmp_folder = get_resources_abs_path()
     
     if image_encoded is None:
-        img_file_name = save_to_s3(user_id, image, encoded=False)
+        img_file_name = save_to_s3(user_id, image, tmp_folder, encoded=False)
     else:
-        img_file_name = save_to_s3(user_id, image_encoded) 
+        img_file_name = save_to_s3(user_id, image_encoded, tmp_folder) 
     
     checkpoint = add_checkpoint(user_id, name, type, img_file_name, longitude, latitude, description, price, expiry_datetime, img_location="s3")
     user_checkpoint  = add_checkpoint_to_user(user, checkpoint)
