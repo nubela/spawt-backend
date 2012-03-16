@@ -9,7 +9,8 @@ from util import S3
 def get_checkpoint_img_url(cp_obj):
     #return s3 url
     if cp_obj.img_location == "s3":
-        generator = S3.QueryStringAuthGenerator(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+        generator = S3.QueryStringAuthGenerator(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, is_secure=False)
+        generator.set_expires_in(86400)
         url = generator.get(S3_BUCKET_NAME, cp_obj.image)
         if len(cp_obj.image) != 8:
             url = generator.get(S3_BUCKET_NAME, cp_obj.image + "_optimized.jpg" )
