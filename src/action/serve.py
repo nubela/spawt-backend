@@ -5,6 +5,8 @@ import os
 from local_config import BASE_URL, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY,\
     S3_BUCKET_NAME
 from util import S3
+from boto.cloudfront import CloudFrontConnection
+import boto
 
 def get_checkpoint_img_url(cp_obj):
     #return s3 url

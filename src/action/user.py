@@ -18,7 +18,7 @@ def save_user(access_token, auth_code):
     fb_user = addupdate_facebook_user(fb_user_info["id"], fb_user_info["name"], fb_user_info.get("first_name",None), fb_user_info.get("middle_name",None), 
                                 fb_user_info.get("last_name",None), fb_user_info.get("gender",None), fb_user_info.get("username",None), fb_user_info["link"])
     user = addupdate_user(fb_user.id, fb_user_info["email"], access_token, auth_code)
-    #update_social_graph(access_token, fb_user)
+    update_social_graph(access_token, fb_user)
     
     return fb_user_info, user
 
