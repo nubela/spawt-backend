@@ -2,14 +2,13 @@ from os.path import join as j
 import datetime
 
 FOOD_NAME = "Succulent Sushi"
-FOOD_DESC = """  
-"""
+FOOD_DESC = "Thanks for trying out Spawt! Succulent Sushis is a food Checkpoint we created to demo a great food experience that you could always revisit or share with your friends! There are 2 other types of Checkpoints, press the Back button to check them out."
+
 SHOP_NAME = "Shoes from Bugis Street Store"
-SHOP_DESC = """
-"""
+SHOP_DESC = "This Checkpoint demonstrates a great shopping deal like in this case, we refer to a specific shop with great deals on shoes. And that is what Shop Checkpoints are for! Great shopping deals that you wish to share with your friends."
+
 PLAY_NAME = "Nightlife in Singapore"
-PLAY_DESC = """
-"""
+PLAY_DESC = "Play Checkpoints refer to anything fun that you think your friends might enjoy discovering. From quaint installations, to attractions you think your friends might want to check out, or even nightlife hangouts that you really enjoy! So go on out and the next time you find something interesting, create a relevant Checkpoint and tell your friends to Spawt it!"
 
 def create_demo_checkpoints(user_obj):
     from action.user_checkpoint import add_checkpoint_to_user
